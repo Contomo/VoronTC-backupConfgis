@@ -1,0 +1,29 @@
+#*# <---------------------- SAVE_CONFIG ---------------------->
+#*# DO NOT EDIT THIS BLOCK OR BELOW. The contents are auto-generated.
+#*#
+#*# [tool_probe T0]
+#*# z_offset = -0.519250
+#*#
+#*# [tool T1]
+#*# gcode_x_offset = -0.309375
+#*# gcode_y_offset = -0.803125
+#*# gcode_z_offset = 0.327500
+#*#
+#*# [tool_probe T1]
+#*# z_offset = -0.491750
+#*#
+#*# [tool T2]
+#*# gcode_x_offset = -0.612500
+#*# gcode_y_offset = -0.839063
+#*# gcode_z_offset = -0.377500
+#*#
+#*# [tool_probe T2]
+#*# z_offset = -0.573000
+#*#
+#*# [tool T3]
+#*# gcode_x_offset = -0.810938
+#*# gcode_y_offset = -1.218750
+#*# gcode_z_offset = 0.015000
+#*#
+#*# [tool_probe T3]
+#*# z_offset = -1.081125
