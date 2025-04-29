@@ -1,0 +1,269 @@
+[gcode_macro _MEGA_DUMP_COLLECT]
+description: "Collect up to k1→k2→k3 matches in 'collected_data'. Usage: _MEGA_DUMP_COLLECT SEARCH=some ° terms"
+variable_collected_data: ""
+gcode:
+    {% set raw_search = params.SEARCH|default("")|string|lower %}
+    {% set terms = raw_search.split("°") %}
+    {% set ns = namespace(lines=[]) %}
+    {% for k1 in printer %}
+        {% set v1 = printer[k1] %}
+        {% if v1 is mapping %}
+            {% for k2 in v1 %}
+                {% set v2 = v1[k2] %}
+                {% if v2 is mapping %}
+                    {% for k3 in v2 %}
+                        {% set v3 = v2[k3] %}
+                        {% if not (v3 is mapping or v3 is sequence) %}
+                            {% set ckey = k3|string %}
+                            {% set cval = v3|string %}
+                            {% set ctype = v3.__class__.__name__|string %}
+                            {% set combined = (ckey ~ " " ~ cval ~ " " ~ ctype)|lower %}
+                            {% set keep = True %}
+                            {% for t in terms %}
+                                {% if t|length > 0 and not (t in combined) %}
+                                    {% set keep = False %}
+                                {% endif %}
+                            {% endfor %}
+                            {% if keep %}
+                                {% set path = k1|string ~ "." ~ k2|string %}
+                                {% set hover = "printer." ~ k1|string ~ "." ~ k2|string ~ "." ~ k3|string %}
+                                {% set line = path ~ "||" ~ ckey ~ "||" ~ cval ~ "||" ~ ctype ~ "||" ~ hover %}
+                                {% set ns.lines = ns.lines + [line] %}
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                {% elif not (v2 is mapping or v2 is sequence) %}
+                    {% set ckey = k2|string %}
+                    {% set cval = v2|string %}
+                    {% set ctype = v2.__class__.__name__|string %}
+                    {% set combined = (ckey ~ " " ~ cval ~ " " ~ ctype)|lower %}
+                    {% set keep = True %}
+                    {% for t in terms %}
+                        {% if t|length > 0 and not (t in combined) %}
+                            {% set keep = False %}
+                        {% endif %}
+                    {% endfor %}
+                    {% if keep %}
+                        {% set path = k1|string %}
+                        {% set hover = "printer." ~ k1|string ~ "." ~ k2|string %}
+                        {% set line = path ~ "||" ~ ckey ~ "||" ~ cval ~ "||" ~ ctype ~ "||" ~ hover %}
+                        {% set ns.lines = ns.lines + [line] %}
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        {% elif not (v1 is mapping or v1 is sequence) %}
+            {% set ckey = k1|string %}
+            {% set cval = v1|string %}
+            {% set ctype = v1.__class__.__name__|string %}
+            {% set combined = (ckey ~ " " ~ cval ~ " " ~ ctype)|lower %}
+            {% set keep = True %}
+            {% for t in terms %}
+                {% if t|length > 0 and not (t in combined) %}
+                    {% set keep = False %}
+                {% endif %}
+            {% endfor %}
+            {% if keep %}
+                {% set path = "" %}
+                {% set hover = "printer." ~ k1|string %}
+                {% set line = path ~ "||" ~ ckey ~ "||" ~ cval ~ "||" ~ ctype ~ "||" ~ hover %}
+                {% set ns.lines = ns.lines + [line] %}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+
+    {% set joined = ns.lines|join("@@") %}
+    # We store all lines in a single string, separated by @@
+    # We'll escape ' and " so the SET_GCODE_VARIABLE call doesn't break
+    {% set esc = (joined|replace("'","\\u0027")|replace("\"","\\u0022"))|string %}
+    SET_GCODE_VARIABLE MACRO=_MEGA_DUMP_COLLECT VARIABLE=collected_data VALUE="{esc|string}"
+    RESPOND MSG="Collected { ns.lines|length } matches for '{ raw_search }'. Call _MEGA_DUMP_PRINT to see them."
+    _MEGA_DUMP_PRINT
+
+
+
+[gcode_macro _MEGA_DUMP_PRINT]
+description: "Read the lines from collected_data, highlight them, and print them."
+variable_collected_data: ""
+gcode:
+    {% set color_path = "rgb(128,128,128)" %}
+    {% set color_key = "rgb(0,150,255)" %}
+    {% set color_val = "rgb(255,200,50)" %}
+    {% set color_typ = "rgb(180,180,180)" %}
+    {% set color_high = "rgb(255,0,100)" %}
+    {% set nl = "\u0026\u0023\u0031\u0030\u003b" %}
+    {% set raw_data = collected_data %}
+    {% if not raw_data %}
+        RESPOND MSG="No data in 'collected_data'. Use _MEGA_DUMP_COLLECT first."
+    {% else %}
+        # We'll split by @@ to recover each line
+        {% set lines = raw_data.split("@@") %}
+        {% if lines|length == 1 and lines[0] == "" %}
+            RESPOND MSG="No data found. (collected_data was empty string)"
+        {% else %}
+            {% set ns = namespace(final=[]) %}
+            {% for line in lines %}
+                {% if line %}
+                    {% set parts = line.split("||") %}
+                    {% if parts|length == 5 %}
+                        {% set path_str = parts[0] %}
+                        {% set key_str  = parts[1] %}
+                        {% set val_str  = parts[2] %}
+                        {% set typ_str  = parts[3] %}
+                        {% set hover_str= parts[4]|replace("'","&apos;") %}
+                        
+                        # OPTIONAL: if you want naive substring highlighting for e.g. "time", 
+                        # you can parse the user terms again or keep them. 
+                        # For demonstration, we'll just color the path/key/value/type differently:
+                        {% set line_html = 
+                          "<span title='" ~ hover_str ~ "'>"
+                           ~ "<span style='color:" ~ color_path ~ "'>" ~ path_str ~ "</span> {"
+                           ~ "<span style='color:" ~ color_key ~ "'>" ~ key_str ~ "</span>: "
+                           ~ "<span style='color:" ~ color_val ~ "'>" ~ val_str ~ "</span> "
+                           ~ "<span style='color:" ~ color_typ ~ "'>(" ~ typ_str ~ ")</span>"
+                           ~ "}"
+                           ~ "</span>"
+                        %}
+                        {% set ns.final = ns.final + [ line_html ] %}
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            {% set joined = ns.final|join(nl) %}
+            {% set count_str = ns.final|length|string %}
+            {% set msg = "MEGA_DUMP_PRINT: " ~ count_str ~ " items." ~ nl ~ joined %}
+            RESPOND MSG="{msg}"
+            # If you want to clear out the data after printing, do:
+            SET_GCODE_VARIABLE MACRO=_MEGA_DUMP_PRINT VARIABLE=collected_data VALUE="None"
+        {% endif %}
+    {% endif %}
+
+
+
+
+
+
+
+
+
+
+    [gcode_macro MEGA_DUMP_EASY]
+gcode:
+    {% set ns = namespace(queue=[["printer", printer]], key_count=0, value_count=0) %}
+    {% set max = 10000 %}
+    {% for i in range(max) %}
+        {% if ns.queue|length == 0 %}
+        {% else %}
+            {% set cur = ns.queue[0] %}
+            #RESPOND MSG="{cur}"
+            {% set ns.queue = ns.queue[1:] %}
+
+            {% set cur_path = cur[0] %}
+            {% set cur_obj = cur[1] %}
+            #RESPOND MSG="{cur_obj}"
+            {% if cur_obj is mapping %}
+                {% for k in cur_obj %}
+                    {% set v = cur_obj[k] %}
+                    {% set ns.key_count = ns.key_count + 1 %}
+                    {% set new_path = cur_path ~ "['" ~ k ~ "']" %}
+                    {% if v is mapping %}
+                        {% set ns.queue = ns.queue + [[new_path, v]] %}
+                    {% elif v is sequence %}
+                        {% set ns.value_count = ns.value_count + 1 %}
+                    {% else %}
+                        {% set ns.value_count = ns.value_count + 1 %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+    RESPOND MSG="🧭 key_count: {ns.key_count} | value_count: {ns.value_count}"
+
+
+
+
+
+
+
+
+
+
+    #########################################################################################
+#    _STEPPER_Z_SOFT_TURN_ON    #########################################################
+#########################################################################################
+[gcode_macro _STEPPER_Z_SOFT_TURN_ON]
+description: Softly ramp up Z stepper current to avoid loud bumps or PSU spikes
+variable_default_steps: 5         # default ramp steps
+variable_default_ramp_time: 250   # total ramp time in ms
+gcode:
+    {% if printer.stepper_enable.steppers.stepper_z %}
+        # Already on — skip ramp
+    {% else %}
+        {% set steps = params.STEPS|default(default_steps)|int %}
+        {% set ramp_time = params.RAMP_TIME|default(default_ramp_time)|float %}
+        {% set step_delay = ramp_time / steps %}
+        {% for i in range(steps) %}
+            _SET_Z_STEPPER_CURRENT DUTY={i * (100 // steps)}
+            G4 P{step_delay|int}
+        {% endfor %}
+        _SET_Z_STEPPER_CURRENT DUTY=100
+    {% endif %}
+
+
+
+#########################################################################################
+#    _SET_Z_STEPPER_CURRENT    ##########################################################
+#########################################################################################
+[gcode_macro _SET_Z_STEPPER_CURRENT]
+description: Provide a current percentage (0-100) for all Z TMC drivers
+variable_found_steppers: None
+gcode:
+    {% set duty = params.DUTY|default(100)|int %}
+    {% set z_steps = ['stepper_z', 'stepper_z1', 'stepper_z2', 'stepper_z3'] %}
+    {% set drivers = ['tmc2130', 'tmc2208', 'tmc2209', 'tmc5160', 'tmc2240'] %}
+    {% set ns = namespace(pairs=[]) %}
+
+    {% if found_steppers == None %}
+        # Step 1: find valid stepper-driver config sections
+        {% for zstep in z_steps %}
+            {% for drv in drivers %}
+                {% set candidates = [drv ~ ' ' ~ zstep, drv ~ '_' ~ zstep] %}
+                {% for key in candidates %}
+                    {% if key in printer.configfile.settings %}
+                        {% set _ = ns.pairs.append(zstep ~ ':' ~ key) %}
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        {% endfor %}
+
+        {% if ns.pairs|length > 0 %}
+            {% set valtosave = ns.pairs|join(',') %}
+            SET_GCODE_VARIABLE MACRO=_SET_Z_STEPPER_CURRENT VARIABLE=found_steppers VALUE="{valtosave}"
+        {% else %}
+            RESPOND MSG="❌ No TMC Z drivers found."
+        {% endif %}
+    {% else %}
+        {% set ns.pairs = found_steppers.split(',') %}
+    {% endif %}
+
+    {% set enable = printer.stepper_enable.steppers %}
+    {% for entry in ns.pairs %}
+        {% set parts = entry.split(':') %}
+        {% set stepper = parts[0] %}
+        {% set config_key = parts[1] %}
+        {% set config = printer.configfile.settings[config_key]|default({}) %}
+        {% set run = config.run_current|float %}
+        {% set hold = config.hold_current|float %}
+        {% set new_run = run * (duty / 100.0) %}
+        {% set new_hold = hold * (duty / 100.0) %}
+
+        {% if duty == 0 %}
+            {% if stepper in enable and enable[stepper] %}
+                SET_STEPPER_ENABLE STEPPER={stepper} ENABLE=0
+            {% endif %}
+            SET_TMC_CURRENT STEPPER={stepper} CURRENT={run} HOLDCURRENT={hold}
+        {% else %}
+            SET_TMC_CURRENT STEPPER={stepper} CURRENT={new_run} HOLDCURRENT={new_hold}
+            {% if stepper not in enable or not enable[stepper] %}
+                SET_STEPPER_ENABLE STEPPER={stepper} ENABLE=1
+            {% endif %}
+        {% endif %}
+    {% endfor %}
