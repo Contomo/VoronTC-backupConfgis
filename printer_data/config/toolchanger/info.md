@@ -71,9 +71,8 @@ in there you can change the most common settings related to your config and tool
     You can supply them with extra XYZ parameters to overwrite the restore position
     and restore to a different position after picking up a new tool.
 
-    after toolchange failure, T99 will light up, allowing you to retry/run the recovery gcode.
-    # todo for now is to add the possibility for a mainsail popup when the button is pressed,
-    allowing you to edit docking position, and or selecting a backup tool to be used instead.
+    after toolchange failure, youll get a popup. youll figure it out from there.
+    (if you to edit docking position, remember to manually adjust it in config later, will only work till restart.)
 
  ─────────────────────────────────────────────────────────────────────────
  general gcode macro tips/rules
@@ -100,11 +99,11 @@ in there you can change the most common settings related to your config and tool
  This section defines default shaper values that can be used for all tools
  when no tool-specific overrides are found.
  
- 🧠 These values are only used if:
+ 🟦 These values are only used if:
     - No per-tool save_variables ('shapers_t0', 'shapers_t1', etc.) are defined
     - No tool-specific or toolchanger params override them
  
- 🔍 The macro LOAD_SHAPERS checks for valid shaper values in the following order:
+ 🟦 The macro LOAD_SHAPERS checks for valid shaper values in the following order:
     (highest priority first — first valid match is used)
  
   1️⃣ 'save_variables.shapers_tX' → e.g., 'shapers_t1 = {"freq_x":..., "damp_y":...}'
@@ -113,9 +112,9 @@ in there you can change the most common settings related to your config and tool
   4️⃣ 'save_variables.shapers_default' → fallback shared dictionary
   5️⃣ '[input_shaper]' (this section) → ultimate fallback
  
- 📌 Required keys must include:
-     - "freq" (for frequency)  🔁
-     - "damp" (for damping)    💧
+ 🟦 Required keys must include:
+     - "freq" (for frequency)
+     - "damp" (for damping)
      - "x" / "y" (axis specifiers)
 
  Example valid names:
