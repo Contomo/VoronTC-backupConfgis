@@ -1,3 +1,8 @@
+TODO (things that dont work yet)
+
+- proper pause resume
+- bed meshing
+
 
 
 ────── First Setup ────────────────────────────
@@ -9,7 +14,7 @@ Hit restart and see if homing works for you.
 next step id suggest is to look over the settings in toolchanger.cfg
 in there you can change the most common settings related to your config and toolchanging.
 
-
+This config is meant for people who like to press press buttons rather then read all pages of a manual. meant for a fuck around find out approach.
 
 
 ──────🔧 INIT & CONFIG ─────────────────────────────────────────────────────────────────────────────────
@@ -37,8 +42,9 @@ in there you can change the most common settings related to your config and tool
    _INIT_SVF_KEYS                  # Ensures required tool offset keys exist in save_variables, can auto-repair missing keys.
    _TC_UPDATE_OFFSETS              # Stages tool offsets from TC_FIND_TOOL_OFFSETS, called with SAVE to save results collected to SVF
    _NUDGE_MOVE_OVER_PROBE          # Moves tool 3mm above saved probe position (in svf). Used before probing begins.
-   _TC_LOG_OFFSET_HISTORY          # Logs current tool offset results to save_variables as a rolling buffer for stats later.           (offsets_history_t2 = {"x": [1.23, 1.24, ...], "y": [...], "z": [...], "probe": [...]})
+   _TC_LOG_OFFSET_HISTORY          # Logs current tool offset results to save_variables as a rolling buffer for stats later. (offsets_history_t2 = {"x": [1.23, 1.24, ...], "y": [...], "z": [...], "probe": [...]})
                                    #  → Logging is **rolling**: limited to N entries (set via `max_entries_offsets_history`)
+   TC_PROBE_CALIBRATION_PROBE
 
 ──────🛠️ Extras ────────────────────────────────────────────────────────────────────────────────────────────────
 
