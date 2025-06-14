@@ -7,7 +7,7 @@ PING_IP="1.1.1.1"
 LOGDIR="/home/contomo/printer_data/config/gcode-shell/mesh-wifi-fix/logs"
 LOGFILE="$LOGDIR/wifi-test.log"
 TEST_URL="http://speedtest.tele2.net/1MB.zip"
-MIN_SPEED_KB=2500    # minimum acceptable download (KB/s)
+MIN_SPEED_KB=1000    # minimum acceptable download (KB/s)
 
 # ensure logdir exists
 mkdir -p "$LOGDIR"
