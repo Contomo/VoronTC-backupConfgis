@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+exit 0
 # ─── CONFIGURATION ───────────────────────────────────────────
 INTERFACE="wlan0"
 SSID="Empl-Router"
