@@ -29,6 +29,7 @@ This config is meant for people who like to press press buttons rather then read
 
 ──────🛠️ TOOL CALIBRATION ──────────────────────────────────────────────────────────────────────────────
    --Intended for manual calls--
+   TOOLCHANGER                     # just try the command
    TC_ADJUST_OFFSETS_UI            # most likely to need this when starting out, lets you adjust offets live.
 
    TC_ADJUST_OFFSET                # Manually adjust a tool’s X/Y/Z gcode offset by a given amount. Updates SVF and live G-code offset.
@@ -44,7 +45,7 @@ This config is meant for people who like to press press buttons rather then read
    _NUDGE_MOVE_OVER_PROBE          # Moves tool 3mm above saved probe position (in svf). Used before probing begins.
    _TC_LOG_OFFSET_HISTORY          # Logs current tool offset results to save_variables as a rolling buffer for stats later. (offsets_history_t2 = {"x": [1.23, 1.24, ...], "y": [...], "z": [...], "probe": [...]})
                                    #  → Logging is **rolling**: limited to N entries (set via `max_entries_offsets_history`)
-   TC_PROBE_CALIBRATION_PROBE
+   TC_PROBE_CALIBRATION_PROBE      
 
 ──────🛠️ Extras ────────────────────────────────────────────────────────────────────────────────────────────────
 
