@@ -181,7 +181,35 @@ gcode:
 
 
 
+[display_template logo2]
+param_tn: 'None'
+text:
+  # defaults/our defines.
+  {% set ns     = namespace(is_homing = False) %}
+  {% set actn   = printer.tool_probe_endstop.active_tool_number %}
+  {% set colors = printer['gcode_macro _toolchanger_led_vars'].get('colors', {}).get('logo', {}) %}
+  {% set c      = colors.get(standby, {}) %}
+  {% set status = 'standby' %}
+  # get stuffs
+  {% set pp = printer.printer %}
+  {% set th = pp.lookup_object('toolhead') %}
+  {% set probe = pp.lookup_object('probe') %}
+  # check if we are currently homing
+  {% set ns.is_homing = 'xyz' not in printer.toolhead.homed_axes|lower %}
+  {% for _ in range (3) %}{% set ns.is_homing = False if printer.toolhead.position[loop.index0] else ns.is_homing %}{% endfor %}
+  
+  # check if the probe is currently triggered.
+  {% if ns.is_homing and param_tn|int == actn %}
+    #{% set invert = probe.mcu_probe.query_endstop(th.get_last_move_time()) %}
+    {% set status = 'homing' %}
+  {% endif %}
 
+  # retrieve current status colors and set them.
+  {% for k in ['r','g','b','w'] %}
+    {% set color = colors.get(status, c).get(k, c.get(k, 0)) %}
+    {% set _ = c.update({k: ((color -1)|abs if invert else color)}) %}
+  {% endfor %}
+  {c.r},{c.g},{c.b},{c.w}
 
 
 
