@@ -24,7 +24,7 @@ This config is meant for people who like to press press buttons rather then read
 ──────🛠️ TOOL CALIBRATION FIRST SETUP ──────────────────────────────────────────────────────────────────
 
     TC_FIND_FIRST_CALIBRATION_PROBE_POSITION  # Jog over the probe and run this command to record the first position. only need to do this once.
-    TC_GET_PROBE_TRIGGER_TO_BOTTOM            # Run this after the above (if youre using probe calib.) 
+    TC_FIND_PROBE_TRIGGER_TO_BOTTOM            # Run this after the above (if youre using probe calib.) 
                                               # with a known calibrated tool, to print out the value to use for 'trigger_to_bottom_z'
 
 ──────🛠️ TOOL CALIBRATION ──────────────────────────────────────────────────────────────────────────────
@@ -35,7 +35,7 @@ This config is meant for people who like to press press buttons rather then read
    TC_ADJUST_OFFSET                # Manually adjust a tool’s X/Y/Z gcode offset by a given amount. Updates SVF and live G-code offset.
    TC_FIND_TOOL_OFFSETS            # Main calibration loop; heats tools, moves to probe, runs calibration, and queues offsets for save.
    TC_LOAD_OFFSETS                 # Loads offsets from save_variables for a tool, clamps values, falls back to gcode offsets if needed.
-   TC_GET_PROBE_TRIGGER_TO_BOTTOM  # Assumes active tool is hand calibrated 'perfect' and spits out the value you need to use for trigger to bottom z.
+   TC_FIND_PROBE_TRIGGER_TO_BOTTOM  # Assumes active tool is hand calibrated 'perfect' and spits out the value you need to use for trigger to bottom z.
 
    TC_OFFSET_STATS                 # print out the stats of collected probing results. just try it lol
 
