@@ -1,0 +1,8 @@
+{# math.j2 — reusable helper macros #}
+{%- macro hyp(a, b) -%}
+    {{ (a*a + b*b) | float | sqrt }}
+{%- endmacro -%}
+
+{%- macro circ_area(r) -%}
+    {{ 3.141592653589793 * r * r }}
+{%- endmacro -%}
