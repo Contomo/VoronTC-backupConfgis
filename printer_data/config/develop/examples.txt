@@ -1,0 +1,630 @@
+[gcode_macro CLEAN_NOZZLE]
+description: "Cleans the nozzle of the specified or active tool. Usage: CLEAN_NOZZLE [TEMP|S=<temp>] [T=<tool>]"
+# ── Main settings ───────────────────────────────
+variable_brush_center_x:      319   # Brush centre X (mm)
+variable_brush_center_y:      0     # Brush centre Y (mm)
+variable_brush_height_z:      4.2   # Z height above the brush
+variable_brush_plunge:        0.5   # Z plunge depth at center
+variable_safe_above:          5     # Safety Z above brush (mm)
+variable_wipe_x_length:       32    # Total figure-8 length (X)
+variable_wipe_y_length:       8     # Total figure-8 width (Y)
+# ── Wiping behavior ─────────────────────────────
+variable_wipe_times:          12    # Number of full figure-8 cycles
+variable_path_segments:       400   # Segments per figure-8
+variable_wipe_speed:          300   # Movement speed (mm/s)
+variable_shape:               0     # 0 = 8, 1 = ∞ (0 == along longest edge)
+gcode:
+    {% import toolchanger_helper as tch with context %}
+    {% set math = printer.printer.__class__.__init__.__globals__.importlib.import_module('math') %} ; <- you need meth 
+    {tch.check_ok()}
+
+    #── get settings, build short variable names ─────────────────────────────────
+    {% set p, th, svf, tc   = printer, printer.toolhead, printer.save_variables.variables, printer.toolchanger %}
+    {% set gc_pos           = p.gcode_move.gcode_position %}
+    {% set is_printing      = p.print_stats.state|lower == 'printing' and p.print_stats.filament_used > 1.0 %}
+    {% set tcs, fast_speed  = p['gcode_macro _toolchanger_settings'], p.toolchanger.params_fast_speed %}
+    {% set actn             = tch.get_mounted_tn()|int %}
+    {% set tn               = params.T|default(actn)|int %}
+    {% set cx, cy, z0, dz   = brush_center_x|float, brush_center_y|float, brush_height_z|float, brush_plunge|float %}
+
+    {% if tn == -1 %}{action_raise_error("CLEAN_NOZZLE: No tool specified and no tool is active.")}{% endif %}
+
+    #── get temp from params, cur target, svf or default ─────────────────────────
+    {% set requested       = params.TEMP|default(params.S)|default(none)|float(none) %}
+    {% if requested is none %}
+        {% set print_temp  = svf.get('recent_tooltemps', {}).get(tch.tk_lower(tn), None)|int(tch.get_tool_target(tn)|int(-1)) %}
+        {% set target_temp = 220 if print_temp - 20 <= tch.get_tool_min_extrude_temp(tn)|int else print_temp -35 %}
+    {% else %}
+        {% set target_temp = [requested|int(0), tch.get_tool_min_extrude_temp(tn)|int - 10]|max %}
+    {% endif %}
+    
+    #── build the figure-8 points ─────────────────────────────────
+    {% set path_pts = [] %}
+    {% set wx, wy   = wipe_x_length|float / 2.0, wipe_y_length|float / 2.0 %}
+    {% set flip = wx > wy and not shape %}
+    {% for i in range(path_segments|int + 1) %}
+        {% set t    = ((i|float / path_segments|float) * 2*math.pi) + math.pi/2.0 %}
+        # ---< decide if horizontal/vertical
+        {% set x = wx * ( math.cos(t) if flip else math.sin(2 * t) ) %}
+        {% set y = wy * ( math.sin(2 * t) if flip else math.cos(t) ) %}
+        
+        {% set z = -(dz|abs) * (1.0 - math.cos(2.0 * t)) / 2.0 %}
+        {% set _ = path_pts.append([x|round(3), y|round(3), z|round(3)]) %}
+    {% endfor %}
+
+    #── first check if we can savely move in ──────────────────
+    {% set dist_y = tch.get_y_distance_to_docks(cy)|float %}
+    {% set tool_y = p[tc.tool_names[tn]].params_tool_size.y or 60 %}
+    {% if dist_y <= tool_y and z0 + safe_above + 5 < gc_pos.z %}
+        {% set y_approach = cy - dist_y + tool_y + (gc_pos.z/th.axis_maximumath.z) * 10 %} 
+    {% endif %} # /\- where we can squeeze into brush location without hitting stuffs
+
+    #── move into position ────────────────────────────────────
+    SAVE_GCODE_STATE NAME=CLEAN_NOZZLE_STATE
+    {tch.try_divide_accel()}
+    G90
+    {% if tn != actn %} 
+        # ---< restore to brush
+        T{tn} X={cx + path_pts[0][0]} Y={cy + path_pts[0][1]} Z={z0 + path_pts[0][2]}
+    {% else %}
+        M104 T{tn} S{target_temp}
+        {% if is_printing %}
+            ROUNDED_G0 Z={gc_pos.z + 1}         F={fast_speed}      D=10 # small lift
+        {% endif %}
+        ROUNDED_G0 X={cx + path_pts[0][0]}      F={fast_speed}      D=100
+        {% if y_approach %} # too close to docks, need to choose a save approach
+            ROUNDED_G0 Y={y_approach}           F={fast_speed}      D=20
+        {% endif %}
+        ROUNDED_G0 Z={z0 + safe_above}          F={fast_speed}      D=20
+        ROUNDED_G0 Y={cy + path_pts[0][1]}      F={fast_speed}      D=20
+        ROUNDED_G0 Z={z0 + path_pts[0][2]}      F={fast_speed/2}    D=0
+    {% endif %}
+
+    # ---< wait final heat
+    M109 T{tn} S{target_temp} 
+    {tch.restore_vel()}
+
+    #── do the thing ──────────────────────────────────────────
+    {% for pass in range(wipe_times) %}
+        {% for p in path_pts %}
+            {% set x = [[cx + p[0], th.axis_maximumath.x-0.1]|min, th.axis_minimumath.x+0.1]|max %}
+            {% set y = [[cy + p[1], th.axis_maximumath.y-0.1]|min, th.axis_minimumath.y+0.1]|max %}
+            G0 X{x} Y{y} Z{z0 + p[2]} F{wipe_speed|float * 60}
+        {% endfor %}
+    {% endfor %}
+    M400
+    
+    M104 T{tn} S{tch.get_tool_target(tn)} 
+
+    #── return to print in case called during ───────────────
+    {% if is_printing %}
+        {% if tch.get_tool_target(tn)|int > target_temp %}
+            M109 T{tn} S{tch.get_tool_target(tn)|int - 10} # <- wait till close to temp to not ooze or stall on end
+        {% endif %}
+        ROUNDED_G0 Z={z0 + safe_above} F={fast_speed}    D=10
+        {% if y_approach %} # too close to docks, need to choose a save exit
+            ROUNDED_G0 Y={y_approach} F={fast_speed}     D=20
+            ROUNDED_G0 Z={gc_pos.z + 1} F={fast_speed/2} D=20
+        {% endif %}
+        ROUNDED_G0 Y={gc_pos.y} F={fast_speed} D=100
+        ROUNDED_G0 X={gc_pos.x} F={fast_speed} D=100
+        ROUNDED_G0 Z={gc_pos.z} F={fast_speed/2} D=0
+    {% else %}
+        G0 Z{z0 + safe_above}
+    {% endif %}
+
+    #── cleanup ────────────────────────────────────────────────
+    {tch.restore_vel()}
+    RESTORE_GCODE_STATE NAME=CLEAN_NOZZLE_STATE MOVE=0
+    TC_LOAD_OFFSETS
+
+
+
+
+
+[gcode_macro SHX]
+gcode:
+  {% set cmd = params.CMD|default('', true) %}
+  {% if not cmd %}
+    RESPOND TYPE=error MSG="SHX needs CMD=\"...\""
+  {% else %}
+    {% set sp = printer.printer.__class__.__init__.__globals__.importlib.import_module('subprocess') %}
+    {% set cp = sp.run(['bash','-lc', cmd], capture_output=True, text=True) %}
+    {% set out = cp.stdout %}
+    {% set MAX = params.TRUNC|default(1200)|int %}
+    {% if out|length > MAX %}
+      {% set out = out[:MAX] ~ '\n…(truncated)' %}
+    {% endif %}
+    {action_respond_info("SHX[rc=" ~ cp.returncode ~ "]: " ~ out|e)}
+  {% endif %}
+
+
+
+[gcode_macro _REGISTER_MODULES_AT_START]
+variable_val: {}
+gcode:
+    {% if not val %}
+        {% set wanted = [ 'time','os','sys','math','random',
+                          'itertools','functools','re',
+                          'json','logging','numpy', 'ast', 'matplotlib'] %}
+        {% set env   = printer.printer.lookup_object('gcode_macro').env %}
+        {% set gbl   = printer.printer.__class__.__init__.__globals__ %}
+        {% set ilib  = gbl.importlib %}
+        {% set ok, err = [], [] %}
+        {% for m in wanted %}
+            {% set spec = ilib.util.find_spec(m) %}
+            {% set mod  = gbl.get(m) if m in gbl else (ilib.import_module(m) if spec else None) %}
+            {% if mod is not none %}
+                {% set _ = env.globals.update({m: mod}) %}
+                {% set _ = ok.append(' - \'' ~ m ~ '\'') %}
+            {% else %}
+                {% set _ = err.append(' - \'' ~ m ~ '\'') %}
+            {% endif %}
+        {% endfor %}
+        {% set va = {'ok': ok, 'err': err}|string|replace('"', '\\"') %}
+        SET_GCODE_VARIABLE MACRO=_REGISTER_MODULES_AT_START VARIABLE=val VALUE="{va}"
+        UPDATE_DELAYED_GCODE ID=_REGISTER_MODULES_AT_START DURATION=1
+    {% else %}
+         {% set html = "<details><summary>registered: " ~ val.ok|length ~ "</summary>"
+                ~ val.ok|join("<br>") ~ "</details>"
+                ~ (val.err and "<details><summary>failed: " ~ val.err|length ~ "</summary>"
+                ~ val.err|join('<br>') ~ "</details>" or "") %}
+        {action_respond_info(html)}
+    {% endif %}
+
+[delayed_gcode _REGISTER_MODULES_AT_START]
+initial_duration: 0.01
+gcode:
+    _REGISTER_MODULES_AT_START
+
+
+
+
+[gcode_macro SHXB]
+description: "Non-blocking host shell (START/PEEK/LIST/CLEAN). Use START with CMD="…" or PATH="/abs/file" [ARGS="…"]"
+variable_jobs: {}
+gcode:
+    {% set A     = params.ACTION|default('HELP')|upper %}
+    {% set CMD   = params.CMD|default('', true) %}
+    {% set PATH  = params.PATH|default('', true) %}
+    {% set ARGS  = params.ARGS|default('', true) %}
+    {% set ID    = params.ID|default('', true) %}
+    {% set TRUNC = params.TRUNC|default(1500)|int %}
+
+    {% set gbl   = printer.printer.__class__.__init__.__globals__ %}
+    {% set ilib  = gbl.importlib %}
+    {% set sp    = ilib.import_module('subprocess') %}
+    {% set bi    = ilib.import_module('builtins') %}
+    {% set os    = ilib.import_module('os') %}
+    {% set shlex = ilib.import_module('shlex') %}
+    {% set time  = ilib.import_module('time') %}
+    {% set sc    = bi.chr(59) %}
+
+    {% if A == 'START' %}
+        {% set job_id = (time.time_ns() // 1000000)|string %}
+        {% set log    = '/tmp/shxb_' ~ job_id ~ '.log' %}
+        {% set qlog   = "'" ~ log ~ "'" %}
+
+        {% if CMD %}
+            {% set cmdline = CMD %}
+        {% elif PATH %}
+            {% set argv = [] %}
+            {% set _ = argv.append(PATH) %}
+            {% for tok in shlex.split(ARGS) if ARGS %}
+                {% set _ = argv.append(tok) %}
+            {% endfor %}
+            {% set cmdline = shlex.join(argv) %}
+        {% else %}
+            {action_respond_info("SHXB START needs CMD=\"...\" or PATH=/abs/file [ARGS=...]")}
+        {% endif %}
+        {% if CMD or PATH %}
+            {% set wrapped = "( " ~ cmdline ~ " " ~ sc ~ " rc=$? " ~ sc ~ " printf '%s\\n' \"__SHXB_DONE__ rc=$rc\" >> " ~ qlog ~ " " ~ sc ~ " exit $rc ) > " ~ qlog ~ " 2>&1 & disown" %}
+            {% set _ = sp.Popen(['bash','-lc', wrapped], start_new_session=True) %}
+            {% set _ = jobs.update({ job_id: {'log': log} }) %}
+            {action_respond_info(("SHXB START id=" ~ job_id ~ " log=" ~ log)|e)}
+        {% endif %}
+
+    {% elif A == 'PEEK' %}
+        {% if not ID %}
+            {action_respond_info("SHXB PEEK needs ID=<job_id>")}
+        {% elif ID not in jobs %}
+            {action_respond_info("SHXB unknown id=" ~ ID|e)}
+        {% else %}
+            {% set log = jobs[ID]['log'] %}
+            {% set text = '' %}
+            {% if os.path.exists(log) and bi.open %}
+                {% set f = bi.open(log, 'r') %}
+                {% set text = f.read() %}
+                {% set _ = f.close() %}
+            {% endif %}
+            {% set done = "__SHXB_DONE__ rc=" in text %}
+            {% if text|length > TRUNC %}
+                {% set start = (text|length) - TRUNC %}
+                {% if start < 0 %}{% set start = 0 %}{% endif %}
+                {% set text = '…(truncated tail)\n' ~ text[start:] %}
+            {% endif %}
+            {action_respond_info("SHXB PEEK id=" ~ ID ~ " done=" ~ (done and 1 or 0) ~ "\n" ~ text)}
+        {% endif %}
+
+    {% elif A == 'LIST' %}
+        {% set listing = jobs.keys()|list|join(', ') %}
+        {action_respond_info(("SHXB LIST " ~ (jobs|length) ~ " job(s): " ~ listing)|e)}
+
+    {% elif A == 'CLEAN' %}
+        {% if ID and ID in jobs %}
+            {% set log = jobs[ID]['log'] %}
+            {% set _ = sp.run(['bash','-lc', "rm -f -- '" ~ log ~ "'"], capture_output=True, text=True) %}
+            {% set _ = jobs.pop(ID) %}
+            {action_respond_info("SHXB CLEAN id=" ~ ID ~ " ok")}
+        {% elif not ID %}
+            {% for jid, meta in jobs.items() %}
+                {% set _ = sp.run(['bash','-lc', "rm -f -- '" ~ meta['log'] ~ "'"], capture_output=True, text=True) %}
+            {% endfor %}
+            {% set _ = jobs.clear() %}
+            {action_respond_info("SHXB CLEAN all ok")}
+        {% else %}
+            {action_respond_info("SHXB CLEAN unknown id=" ~ ID)}
+        {% endif %}
+
+    {% else %}
+        {% set s = "SHXB usage:\n" ~
+                   "  SHXB ACTION=START CMD='uname -a" ~ sc ~ " sleep 1" ~ sc ~ " echo done'\n" ~
+                   "  SHXB ACTION=START PATH='/usr/bin/printf' ARGS='%s\\nfrom file'\n" ~
+                   "  SHXB ACTION=PEEK  ID=<job_id> [TRUNC=1500]\n" ~
+                   "  SHXB ACTION=LIST\n" ~
+                   "  SHXB ACTION=CLEAN [ID=<job_id>]\n" ~
+                   "Notes: non-blocking; logs at /tmp/shxb_<id>.log" %}
+        {action_respond_info(s)}
+    {% endif %}
+
+    SET_GCODE_VARIABLE MACRO=SHXB VARIABLE=jobs VALUE="{jobs}"
+
+
+[gcode_macro PA_PLANE_PLOT]
+gcode:
+    # --- Parameters ---
+    {% set elev = params.ELEV|default(25)|int %}
+    {% set azim = params.AZIM|default(120)|int %}
+    {% set size = params.SIZE|default(10)|int %}
+    {% set res = params.RES|default(100)|int %}
+    # DEGREE controls the complexity of the fitted model. 3 is a robust starting point.
+    {% set degree = params.DEGREE|default(3)|int %}
+
+    # --- Setup and Imports ---
+    {% set import       = printer.printer.__class__.__init__.__globals__.importlib.import_module %}
+    {% set io           = import('io') %}
+    {% set b64          = import('base64') %}
+    {% set np           = import('numpy') %}
+    {% set math         = import('math') %}
+    {% set _3d          = import('mpl_toolkits.mplot3d') %}
+    {% set matplotlib   = import('matplotlib') %}
+    {% set plt          = matplotlib.pyplot %}
+
+    # --- Data Parsing from _PA_DATA_STORAGE ---
+    {% set parsed_data = [] %}
+    {% set all_pa, all_flow, all_accel = [], [], [] %}
+
+    {% for name, data in printer['gcode_macro _PA_DATA_STORAGE'].items() if name.startswith('graph_') %}
+      {% if name.startswith('graph_') %}
+        {% set lines = (data|replace('|', '\n')).strip().split('\n') %}
+        {% set d_pa, d_flow, d_accel = [], [], [] %}
+        {% for line in lines[1:] %}
+            {% set items = line.strip().split(',') %}
+            {% if items|length == 3 %}
+                {% set _ = d_pa.append(items[0]|float) %}
+                {% set _ = d_flow.append(items[1]|float) %}
+                {% set _ = d_accel.append(items[2]|float) %}
+            {% endif %}
+        {% endfor %}
+        {% if d_pa %}
+            {% set _ = parsed_data.append({'name': name|replace('graph_', ''), 'pa': d_pa, 'flow': d_flow, 'accel': d_accel}) %}
+            {% set _ = all_pa.extend(d_pa) %}
+            {% set _ = all_flow.extend(d_flow) %}
+            {% set _ = all_accel.extend(d_accel) %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+
+    # --- Plot Generation ---
+    {% set n_plots = parsed_data|length %}
+    {% if n_plots > 0 %}
+        {% set _ = plt.style.use('dark_background') %}
+        {% set ncols = math.ceil(math.sqrt(n_plots))|int %}
+        {% set nrows = math.ceil(n_plots / ncols)|int %}
+        
+        {% set fig, axes = plt.subplots(nrows, ncols, figsize=(size, size), subplot_kw={'projection': '3d'}) %}
+        {% set axes_flat = axes.flatten() if n_plots > 1 else [axes] %}
+        
+        {% for data in parsed_data %}
+            {% if data.pa|length > 3 %}
+                {% set ax = axes_flat[loop.index0] %}
+                
+                {% set x_data = np.array(data.accel) %}
+                {% set y_data = np.array(data.flow) %}
+                {% set z_data = np.array(data.pa) %}
+
+                # --- CORRECT, STABLE MODEL FITTING ---
+                # STAGE 1: Standardize the data (mean=0, std=1) for numerical stability.
+                {% set x_mean, x_std = x_data.mean(), x_data.std() %}
+                {% set y_mean, y_std = y_data.mean(), y_data.std() %}
+                
+                # Avoid division by zero on flat data.
+                {% if x_std == 0.0 %}{% set x_std = 1.0 %}{% endif %}
+                {% if y_std == 0.0 %}{% set y_std = 1.0 %}{% endif %}
+                
+                {% set x_scaled = (x_data - x_mean) / x_std %}
+                {% set y_scaled = (y_data - y_mean) / y_std %}
+
+                # STAGE 2: Build the design matrix from the stable, scaled data.
+                {% set A = [] %}
+                {% for i in range(degree + 1) %}
+                    {% for j in range(degree + 1 - i) %}
+                        {% set _ = A.append((x_scaled**i) * (y_scaled**j)) %}
+                    {% endfor %}
+                {% endfor %}
+                {% set A = np.vstack(A).T %}
+                
+                # STAGE 3: Use least squares to find the best-fit coefficients. This is now stable.
+                {% set coeffs, _, _, _ = np.linalg.lstsq(A, z_data, rcond=None) %}
+
+                # --- EVALUATION ON HIGH-RESOLUTION GRID ---
+                # Create the plot grid using the full range of all datasets.
+                {% set accel_space = np.linspace(all_accel|min, all_accel|max, res) %}
+                {% set flow_space = np.linspace(all_flow|min, all_flow|max, res) %}
+                {% set A_grid, F_grid = np.meshgrid(accel_space, flow_space) %}
+
+                # Apply the *exact same* standardization to the grid before evaluating.
+                {% set A_grid_scaled = (A_grid - x_mean) / x_std %}
+                {% set F_grid_scaled = (F_grid - y_mean) / y_std %}
+
+                # Evaluate the polynomial model across the grid.
+                {% set PA_final = np.zeros(A_grid.shape) %}
+                {% set k = 0 %}
+                {% for i in range(degree + 1) %}
+                    {% for j in range(degree + 1 - i) %}
+                        {% set PA_final = PA_final + coeffs[k] * (A_grid_scaled**i) * (F_grid_scaled**j) %}
+                        {% set k = k + 1 %}
+                    {% endfor %}
+                {% endfor %}
+
+                # --- Plotting Stage ---
+                {% set surf = ax.plot_surface(A_grid, F_grid, PA_final, cmap='viridis', edgecolor='none', antialiased=True, rstride=1, cstride=1) %}
+                {% set _ = ax.scatter(x_data, y_data, z_data, c='red', s=15, depthshade=False, label='Measured Points') %}
+
+                # --- Formatting ---
+                {% set _ = ax.set_title(data.name, color='white', pad=20) %}
+                {% set _ = ax.set_xlabel('Accel', fontsize=8) %}
+                {% set _ = ax.set_ylabel('Flow', fontsize=8) %}
+                {% set _ = ax.set_zlabel('PA', fontsize=8) %}
+                {% set _ = ax.set_xlim(all_accel|min, all_accel|max) %}
+                {% set _ = ax.set_ylim(all_flow|min, all_flow|max) %}
+                {% set _ = ax.set_zlim(all_pa|min, all_pa|max) %}
+                {% set _ = ax.view_init(elev=elev, azim=azim) %}
+                {% set _ = ax.tick_params(labelsize=7) %}
+                {% set _ = ax.invert_xaxis() %}
+            {% endif %}
+        {% endfor %}
+
+        # --- Final Touches ---
+        {% for i in range(n_plots, nrows * ncols) %}
+            {% set _ = fig.delaxes(axes_flat[i]) %}
+        {% endfor %}
+        {% set _ = fig.tight_layout(pad=3.0) %}
+
+        # --- SVG Conversion ---
+        {% set buf = io.BytesIO() %}
+        {% set _ = fig.savefig(buf, format='svg', transparent=True) %}
+        {% set _ = plt.close(fig) %}
+        {% set svg = buf.getvalue() %}
+        {% set img = 'data:image/svg+xml;base64,' ~ b64.b64encode(svg).decode() %}
+
+        {action_respond_info('<img style="background-color:rgb(34,34,34); max-width:100%;" src="' ~ img ~ '"/>')}
+    {% endif %}
+
+
+
+
+
+[gcode_macro INSPECT_OBJECT]
+description: "Usage: INSPECT_OBJECT O=<name> [F=<filter>] [DUNDER=1]"
+variable_color_attr:            "rgb(150, 220, 255)"
+variable_color_method:          "rgb(130, 255, 150)"
+variable_color_private_method:  "rgb(180, 220, 180)"
+variable_color_getter:          "rgb(255, 200, 100)"
+variable_color_command:         "rgb(255, 160, 122)"
+variable_color_val:             "rgb(240, 240, 240)"
+variable_color_type:            "rgb(160, 160, 160)"
+variable_color_doc:             "rgb(140, 160, 140)"
+variable_color_klipper_obj:     "rgba(255, 130, 80, 0.6)"
+variable_color_container:       "rgb(210, 180, 255)"
+variable_color_arg_self:        "rgb(255, 110, 180)"
+variable_color_arg_other:       "rgb(137, 207, 240)"
+variable_val_cutoff:            200
+variable_font_size:             "0.8em"
+gcode:
+    {%- set p = printer.printer -%}
+    {%- set obj_name = params.O|default(params.OBJECT|default(None)) -%}
+    {%- if obj_name is none -%} {action_raise_error("Usage: INSPECT_OBJECT O=<name> [DEPTH=0] [F=<filter>] [DUNDER=1]")} {%- endif -%}
+
+    {% set max_depth = params.DEPTH|default(1)|int %}
+
+    # find the closest match if it didnt exactly match
+    {%- set obj = p.lookup_object(obj_name, None) -%}
+    {%- if obj is none -%}
+        {%- set ns = namespace(best_match_obj=None, best_match_name=None) -%}
+        {%- set search_lower = obj_name|lower -%}
+        {%- for candidate_name, candidate_obj in p.lookup_objects() if search_lower in candidate_name|lower -%}
+            {%- if ns.best_match_name is none or candidate_name|length < ns.best_match_name|length -%}
+                {%- set ns.best_match_obj = candidate_obj -%}
+                {%- set ns.best_match_name = candidate_name -%}
+            {%- endif -%}
+        {%- endfor -%}
+        {%- if ns.best_match_obj is not none -%}
+            {action_respond_info("Object '" ~ obj_name|e ~ "' not found. Using best match: '" ~ ns.best_match_name|e ~ "'")}
+            {%- set obj = ns.best_match_obj -%}
+            {%- set obj_name = ns.best_match_name -%}
+        {%- else -%}
+            {action_respond_info("Object '" ~ obj_name|e ~ "' not found. No partial matches found either.")}
+            {%- set obj = {} -%}
+        {%- endif -%}
+    {%- endif -%}
+
+    #-------------------------------------------------------------------------------------------------------------------------------------
+    # just small helpers
+    {%- macro _span(color, txt) -%}
+        {"<span style='color:" ~ color ~ "'>" ~ txt|e ~ "</span>"}
+    {%- endmacro -%}
+    {%- macro _details(summary, content, is_open=False) -%}
+        {"<details" ~ (" open" if is_open else "") ~ "><summary style='cursor:pointer;'>" ~ summary ~ "</summary><div style='padding-left: 20px; border-left: 1px solid rgb(51, 51, 51);'>" ~ content ~ "</div></details>"}
+    {%- endmacro -%}
+    {%- macro _row(label_html, value_html) -%}
+        {"<div style='display: flex; align-items: baseline;'>" ~ label_html ~ value_html ~ "</div>"}
+    {%- endmacro -%}
+
+    {% set already_explored_objects = ['printer', 'toolhead', 'main'] %}
+
+    # render values
+    {%- macro _render_value(val, as_string=False, depth=0) -%}#{%- macro _render_value(val, as_string=False) -%}
+        {%- set type_name = val.__class__.__name__ -%}
+        {%- set val_str_raw = val|string -%}
+        {%- if as_string -%}
+            {%- if val is none -%}None
+            {%- elif val is sameas True or val is sameas False -%}{val|string}
+            {%- elif val is mapping -%}{"{...}"}
+            {%- elif val is sequence and val is not string -%}{"[...]" }
+            {%- elif '<' in val_str_raw and 'object at 0x' in val_str_raw -%}{"<" ~ type_name ~ ">"}
+            {%- else -%}{ "'" ~ val_str_raw|truncate(30) ~ "'" }
+            {%- endif -%}
+        {%- else -%}
+            {%- if val is none -%} {_span(color_val, 'None') ~ " " ~ _span(color_type, '(NoneType)')}
+            {%- elif val is sameas True or val is sameas False -%} {_span(color_val, val|string) ~ " " ~ _span(color_type, '(bool)')}
+            {%- elif val is mapping -%}
+                {%- set summary = _span(color_container, "(dict, " ~ val|length ~ " items)") -%}
+                {%- set items = [] -%}
+                {%- for k, v in val.items() -%}
+                    {%- set _ = items.append(_row(_span(color_attr, k|string ~ ": "), _render_value(v, False, depth))) -%}
+                {%- endfor -%}
+                {_details(summary, items|join(''))}
+            {%- elif val is sequence and val is not string -%}
+                {%- set summary = _span(color_container, "(list, " ~ val|length ~ " items)") -%}
+                {%- set items = [] -%}
+                {%- for item in val -%}
+                    {%- set _ = items.append(_row(_span(color_type, "[" ~ loop.index0 ~ "]: "), _render_value(item, False, depth))) -%}
+                {%- endfor -%}
+                {_details(summary, items|join(''))}
+            {%- elif '<' in val_str_raw and 'object at 0x' in val_str_raw -%}
+                {%- set summary = _span(color_klipper_obj, "<" ~ type_name ~ ">") -%}
+                {%- if depth >= max_depth or already_explored_objects|select('in', val_str_raw|lower)|list -%}
+                    { summary }
+                {%- else -%}
+                    {%- set rows = [] -%}
+                    {%- set _ = already_explored_objects.append(val_str_raw) -%}
+                    {%- for an in val.__dir__()|sort if (params.DUNDER or not an.startswith('__')) and rows|length < 100 -%}
+                        {%- set subval = val|attr(an) -%}
+                        {%- if (subval is not undefined) and (subval is not callable) -%}
+                            {%- set _ = rows.append(_row(_span(color_attr, an ~ ": "), _render_value(subval, False, depth + 1))) -%}
+                        {%- endif -%}
+                    {%- endfor -%}
+                    { _details(summary, rows|join('')) }
+                {%- endif -%}
+            {%- else -%}
+                {%- set val_str = val_str_raw -%}
+                {%- if val_str|length > val_cutoff -%}{%- set val_str = val_str[:val_cutoff] ~ '…' -%}{%- endif -%}
+                { _span(color_val, "'" ~ val_str ~ "'") ~ " " ~ _span(color_type, "(" ~ type_name ~ ")") }
+            {%- endif -%}
+        {%- endif -%}
+    {%- endmacro -%}
+
+    # render method/function + signature
+    {%- macro _render_callable(callable_obj, name, color, override_doc=None) -%}
+        {%- if callable_obj.__code__.co_varnames is defined -%}
+            {%- set signature_html = [] -%}
+            {%- set code = callable_obj.__code__ -%}
+            {%- set defaults = callable_obj.__defaults__ or () -%}
+            {%- set arg_names = code.co_varnames[:code.co_argcount] -%}
+            {%- set first_default_idx = arg_names|length - defaults|length -%}
+            {%- for i in range(arg_names|length) -%}
+                {%- set arg_name = arg_names[i] -%}
+                {%- set arg_color = color_arg_self if arg_name == 'self' else color_arg_other -%}
+                {%- if i >= first_default_idx -%}
+                    {%- set default_val_str = _render_value(defaults[i - first_default_idx], as_string=True) -%}
+                    {%- set _ = signature_html.append(_span(arg_color, arg_name) ~ "=" ~ _span(color_val, default_val_str)) -%}
+                {%- else -%}
+                    {%- set _ = signature_html.append(_span(arg_color, arg_name)) -%}
+                {%- endif -%}
+            {%- endfor -%}
+            {%- set doc = override_doc or callable_obj.__doc__|string|trim -%}
+            {%- set full_signature = _span(color, name ~ "(") ~ signature_html|join(', ') ~ _span(color, ")") -%}
+            {%- if doc and doc != 'None' -%}
+                {%- set doc_html = _span(color_doc, " // " ~ doc|replace('\n', ' ')|truncate(100)) -%}
+                {full_signature ~ doc_html}
+            {%- else -%}
+                {full_signature}
+            {%- endif -%}
+        {%- else -%}
+            {%- set type_name = callable_obj.__class__.__name__ -%}
+            {_span(color, name ~ "(i dunno)") ~ _span(color_type, "<" ~ type_name ~ ">")}
+        {%- endif -%}
+    {%- endmacro -%}
+
+    #-------------------------------------------------------------------------------------------------------------------------------------
+    {%- set attributes, public_methods, private_methods, getters, commands, output = [], [], [], [], [], [] -%}
+    {%- set filt = params.F|default("")|lower -%}
+    {%- set help_strings = {} -%}
+
+    {%- if obj -%}
+        # find _help to attatch later
+        {%- for attr_name in obj.__dir__() -%}
+            {%- if attr_name.startswith('cmd_') and attr_name.endswith('_help') -%}
+                {%- set _ = help_strings.update({attr_name|replace('_help', ''): obj|attr(attr_name)}) -%}
+            {%- endif -%}
+        {%- endfor -%}
+        
+        # main loop
+        {%- for attr_name in obj.__dir__()|sort -%}
+            {%- if (not attr_name.startswith('__') or params.DUNDER) and (not filt or filt in attr_name|lower) and not attr_name.endswith('_help') -%}
+                {%- set attr_val = obj|attr(attr_name) -%}
+                {%- if attr_val.__code__ is defined and attr_val.__code__.co_varnames is defined -%}
+                    {%- set doc = help_strings.get(attr_name, None) -%}
+                    {%- if attr_name.startswith('get_') -%}
+                        {%- set code = attr_val.__code__ -%}
+                        {%- if code.co_argcount == 2 and code.co_varnames[1] == 'eventtime' or code.co_argcount == 1 -%}
+                            {%- set return_val = attr_val(p.get_reactor().monotonic()) if code.co_argcount != 1 else attr_val() -%}
+                            {%- set status_html = _render_callable(attr_val, attr_name, color_getter) ~ ': ' ~ _render_value(return_val) -%}
+                            {%- set _ = getters.append( "<div style='display: flex; align-items: baseline;'>" ~ status_html ~ "</div>") -%}
+                        {%- else -%}
+                            {%- set _ = getters.append(_render_callable(attr_val, attr_name, color_getter, doc)) -%}
+                        {%- endif -%}
+                    {%- elif attr_name.startswith('cmd_') -%} {%- set _ = commands.append(       _render_callable(attr_val, attr_name, color_command,        doc)) -%}
+                    {%- elif attr_name.startswith('_') -%}    {%- set _ = private_methods.append(_render_callable(attr_val, attr_name, color_private_method, doc)) -%}
+                    {%- else -%}                              {%- set _ = public_methods.append( _render_callable(attr_val, attr_name, color_method,         doc)) -%}
+                    {%- endif -%}
+                {%- elif attr_val is callable -%}
+                    {%- set type_name = attr_val.__class__.__name__ -%}
+                    {%- set fallback_html = "<div>" ~ _span(color_private_method, attr_name ~ "(i dunno)") ~ _span(color_type, "<"|e ~ type_name) ~ ">"|e ~ "</div>" -%}
+                    {%- set _ = private_methods.append(fallback_html) if attr_name.startswith('_') else public_methods.append(fallback_html) -%}
+                {%- else -%}
+                    {%- set attr_html = "<div style='display: flex; align-items: baseline;'>" ~ _span(color_attr, attr_name ~ ": ") ~ _render_value(attr_val) ~ "</div>" -%}
+                    {%- set _ = attributes.append(attr_html) -%}
+                {%- endif -%}
+            {%- endif -%}
+        {%- endfor -%}
+    {%- endif -%}
+    
+    {% set out = [ (color_getter,         'Getters',         getters),
+                   (color_command,        'Commands',        commands),
+                   (color_method,         'Public Methods',  public_methods),
+                   (color_private_method, 'Private Methods', private_methods) 
+                ] %}
+    {%- set _ = output.append(_details(_span(color_attr, "Attributes (" ~ attributes|length ~ ")"), attributes|sort|join(''))) if attributes else '' -%}
+    {%- for col, name, pile in out if pile -%}
+        {%- set open = pile|length <= 5 -%}
+        {%- set content = "<div>" ~ pile|sort|join('</div><div>') ~ "</div>" -%}
+        {%- set _ = output.append(_details(_span(col, name ~ " (" ~ pile|length ~ ")"), content, open)) -%}
+    {%- endfor -%}
+    #--- Assemble and Print Report ---
+
+    {%- set title = "<b>Inspecting Object: '" ~ obj_name|e ~ "'</b>" -%}
+    {%- set report = _details(title, output|join(''), is_open=True) -%}
+    # may klipper forgive me for shitting literal megabytes to the console in one respond
+    {action_respond_info("<div style='font-size: " ~ font_size ~ ";'>" ~ report ~ "</div>") if obj else ''} #font-family: monospace; 
