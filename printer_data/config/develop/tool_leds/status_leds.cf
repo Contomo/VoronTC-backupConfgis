@@ -1,0 +1,274 @@
+
+[status_leds]
+fadetime_default: 1
+active:
+    tc_error:       index_led_effect logo_error
+
+    changing_to:    index_led_effect changing_to
+                    index_led_effect nozzle_on
+
+    changing_from:  index_led_effect changing_from
+                    index_led_effect nozzle_on
+
+    leveling:       index_led_effect fade_orangeish_blue
+                    index_led_effect nozzle_on
+
+    homing:         index_led_effect coolwave FADETIME=2
+                    index_led_effect nozzle_on
+
+    paused:         index_led_effect rainbow
+                    index_led_effect nozzle_on
+
+    probing:        index_led_effect probing_logo
+                    index_led_effect nozzle_on
+
+    printing:       index_led_effect fade_pink_cyan
+                    index_led_effect nozzle_on
+
+    busy:           index_led_effect magenta_teal FADETIME=2
+                    index_led_effect nozzle_on
+
+    ready:          index_led_effect logo_ready
+                    index_led_effect nozzle_on
+
+    idle:           index_led_effect idle_timeout
+inactive:           
+    heating:        index_led_effect nozzle_temp
+
+    printing:       index_led_effect logo_ready
+                    index_led_effect nozzle_temp
+
+    ready:          index_led_effect logo_ready
+                    index_led_effect nozzle_temp
+                
+    idle:           index_led_effect idle_timeout
+
+
+##### LOGOS --------------------------------------------------------------------------
+
+[index_led_effect scan_bright]
+fadetime: 0.15
+layers:
+    static    1   1  bottom (0.10, 0.10, 0.10), (0.10, 0.10, 0.10), (0.10, 0.10, 0.10)       # base glow so it never goes dark
+    gradient     0.1 1  screen (0.00, 1.00, 1.00), (0.10, 0.60, 1.00), (0.00, 1.00, 0.50)
+    breathing 0.1 1  add    (0.15, 0.60, 1.00), (0.15, 0.60, 1.00), (0.15, 0.60, 1.00)         # gentle highlight pulse
+leds:
+    neopixel:T0_leds (1-8)
+    neopixel:T1_leds (1-8)
+    neopixel:T2_leds (1-8)
+    neopixel:T3_leds (1-8)
+    neopixel:T4_leds (1-8)
+
+[index_led_effect candy]
+fadetime: 0.15
+layers:
+    static    1      1    bottom (0.08, 0.08, 0.08)
+    gradient  0.1    1    screen (1.00, 0.10, 0.60), (0.10, 1.00, 0.80)
+    gradient  0.1    1    screen (1.00, 0.10, 0.60), (0.10, 1.00, 0.80)
+leds:
+    neopixel:T0_leds (1-8)
+    neopixel:T1_leds (1-8)
+    neopixel:T2_leds (1-8)
+    neopixel:T3_leds (1-8)
+    neopixel:T4_leds (1-8)
+
+[index_led_effect coolwave]
+fadetime: 1
+layers:
+    static    1   1     bottom (0.08, 0.08, 0.08)
+    chase  0.5   0.7   add    (0.00, 0.20, 1.00), (0.60, 0.60, 0.60)
+leds:
+    neopixel:T0_leds (1-8)
+    neopixel:T1_leds (1-8)
+    neopixel:T2_leds (1-8)
+    neopixel:T3_leds (1-8)
+    neopixel:T4_leds (1-8)
+
+[index_led_effect amber]
+fadetime: 0.25
+layers:
+    static    1   1 bottom (0.05, 0.02, 0.00)
+    breathing 1.2 1 top    (1.00, 0.35, 0.00)
+leds:
+    neopixel:T0_leds (1-8)
+    neopixel:T1_leds (1-8)
+    neopixel:T2_leds (1-8)
+    neopixel:T3_leds (1-8)
+    neopixel:T4_leds (1-8)
+
+[index_led_effect magenta_teal]
+fadetime: 0.15
+layers:
+    static 1     1 bottom (0.80, 0.00, 1.00)
+    chase  0.1   0.1 add  (0.00, 1.00, 0.80)
+leds:
+    neopixel:T0_leds (1-8)
+    neopixel:T1_leds (1-8)
+    neopixel:T2_leds (1-8)
+    neopixel:T3_leds (1-8)
+    neopixel:T4_leds (1-8)
+
+[index_led_effect flash_bright]
+fadetime: 0.05
+layers:
+    static    1  1 bottom (0.06, 0.06, 0.02)
+    breathing 2  1 top    (1.00, 1.00, 0.00)
+    chase     4  0.25 add (1.00, 0.50, 0.00), (1.00, 1.00, 0.00)
+leds:
+    neopixel:T0_leds (1-8)
+    neopixel:T1_leds (1-8)
+    neopixel:T2_leds (1-8)
+    neopixel:T3_leds (1-8)
+    neopixel:T4_leds (1-8)
+
+
+#----------------------------------------------------------------
+
+
+[index_led_effect rainbow]
+layers:
+    gradient  0.2  0.8 top (1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0)
+leds:
+    neopixel:T0_leds (1-8)
+    neopixel:T1_leds (1-8)
+    neopixel:T2_leds (1-8)
+    neopixel:T3_leds (1-8)
+    neopixel:T4_leds (1-8)
+
+[index_led_effect fade_pink_cyan]
+fadetime: 0.5
+layers:
+    linearfade 0.1 0 screen (1.0, 0.0, 0.5), (0.0, 0.5, 1.0)
+leds:
+    neopixel:T0_leds (1-8)
+    neopixel:T1_leds (1-8)
+    neopixel:T2_leds (1-8)
+    neopixel:T3_leds (1-8)
+    neopixel:T4_leds (1-8)
+
+[index_led_effect fade_pink_yellow]
+fadetime: 0.5
+layers:
+    linearfade 2 0 screen (1.0, 0.0, 0.5), (1.0, 0.5, 0.0)
+leds:
+    neopixel:T0_leds (1-8)
+    neopixel:T1_leds (1-8)
+    neopixel:T2_leds (1-8)
+    neopixel:T3_leds (1-8)
+    neopixel:T4_leds (1-8)
+
+[index_led_effect fade_orangeish_blue]
+fadetime: 1
+layers:
+    linearfade 2 0.8 screen (1.0, 0.5, 0.0), (0.0, 0.0, 1.0), (1.0, 0.5, 0.0), (0.0, 0.0, 1.0)
+leds:
+    neopixel:T0_leds (1-8)
+    neopixel:T1_leds (1-8)
+    neopixel:T2_leds (1-8)
+    neopixel:T3_leds (1-8)
+    neopixel:T4_leds (1-8)
+
+[index_led_effect blue_green_beat]
+fadetime: 1
+layers:
+   breathing  2 0 screen (0.0, 0.1, 1.0), (0.0, 1, 0.5), (0.0, 1.0, 1.0), (0.0, 0.1, 0.5)
+   static     1 0 bottom (1.0, 0.1, 0.0), (1, 0.1, 0.0), (1.0, 0.1, 0.0), (1.0, 1.0, 0.0)
+leds:
+    neopixel:T0_leds (1-8)
+    neopixel:T1_leds (1-8)
+    neopixel:T2_leds (1-8)
+    neopixel:T3_leds (1-8)
+    neopixel:T4_leds (1-8)
+
+[index_led_effect idle_timeout]
+fadetime: 1
+layers:
+    static 1 1 top (0.05, 0.05, 0.05, 0.05)
+leds:
+    neopixel:T0_leds
+    neopixel:T1_leds
+    neopixel:T2_leds
+    neopixel:T3_leds
+    neopixel:T4_leds
+
+[index_led_effect logo_ready]
+fadetime: 0.20
+layers:
+    static 1 1 top (0.90, 0.90, 0.90)
+leds:
+    neopixel:T0_leds (1-8)
+    neopixel:T1_leds (1-8)
+    neopixel:T2_leds (1-8)
+    neopixel:T3_leds (1-8)
+    neopixel:T4_leds (1-8)
+
+[index_led_effect probing_logo]
+fadetime: 0.20
+layers:
+    breathing 2 1 add (0.60, 0.00, 1.00)
+leds:
+    neopixel:T0_leds (1-8)
+    neopixel:T1_leds (1-8)
+    neopixel:T2_leds (1-8)
+    neopixel:T3_leds (1-8)
+    neopixel:T4_leds (1-8)
+
+[index_led_effect logo_error]
+fadetime: 0.10
+layers:
+    breathing 2 1 top (1.00, 0.00, 0.00)
+leds:
+    neopixel:T0_leds (1-8)
+    neopixel:T1_leds (1-8)
+    neopixel:T2_leds (1-8)
+    neopixel:T3_leds (1-8)
+    neopixel:T4_leds (1-8)
+
+[index_led_effect changing_from]
+layers:
+    breathing 1 1 screen (1.00, 0.00, 0.80)
+leds:
+    neopixel:T0_leds (1-8)
+    neopixel:T1_leds (1-8)
+    neopixel:T2_leds (1-8)
+    neopixel:T3_leds (1-8)
+    neopixel:T4_leds (1-8)
+
+[index_led_effect changing_to]
+layers:
+    breathing 1 1 screen (0.00, 1.00, 1.00)
+leds:
+    neopixel:T0_leds (1-8)
+    neopixel:T1_leds (1-8)
+    neopixel:T2_leds (1-8)
+    neopixel:T3_leds (1-8)
+    neopixel:T4_leds (1-8)
+
+[index_led_effect nozzle_temp]
+fadetime: 0.2
+layers:
+    static      1   1  top (0.10, 0.10, 0.10, 0.10)
+    temperature 20 120 add (0.0, 0.0, 0.2), (1.0, 0.0, 0.0)
+leds:
+    neopixel:T0_leds (9-10)
+    neopixel:T1_leds (9-10)
+    neopixel:T2_leds (9-10)
+    neopixel:T3_leds (9-10)
+    neopixel:T4_leds (9-10)
+heater: 
+    extruder
+    extruder1
+    extruder2
+    extruder3
+    extruder4
+
+[index_led_effect nozzle_on]
+fadetime: 0.25
+layers:
+    static 1 1 top (0.50, 0.50, 0.50, 1.00)
+leds:
+    neopixel:T0_leds (9-10)
+    neopixel:T1_leds (9-10)
+    neopixel:T2_leds (9-10)
+    neopixel:T3_leds (9-10)
+    neopixel:T4_leds (9-10)
