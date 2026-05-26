@@ -1,0 +1,858 @@
+{
+    "version": "1.0",
+    "profiles": [
+                {
+                "source": "contomo",
+                "printer": "v2.4_stealthchanger",
+                "date": "01.01.2000",
+                "tool_info": {
+                    "nozzle": 0.4,
+                    "hotend": "rapido_ace_hf",
+                    "nozzle_material": "copper_steel",
+                    "nozzle_type": "standard",
+                    "extruder_type": "direct",
+                    "extruder_name": "hgx_lite"
+                },
+                "pa_info": {
+                    "pa_type": "nonlinear",
+                    "pressure_advance_model": "recipr",
+                    "linear_advance": 0.0147,
+                    "nonlinear_offset": 0.2210,
+                    "linearization_velocity": 0.8,
+                    "pressure_advance_smooth_time": 0.02,
+                    "pressure_advance_time_offset": 0.0017
+                },
+                "filament": {
+                    "type": "asa-cf",
+                    "temp": 255,
+                    "manufacturer": "eSun",
+                    "color": "red-ironoxide",
+                    "diameter": 1.75,
+                    "notes": "i made this up. i just think ASA is close enough to ABS didnt want to run a test."
+                }
+            },
+            {
+                "source": "contomo",
+                "printer": "v2.4_stealthchanger",
+                "date": "21.01.2025",
+                "tool_info": {
+                    "nozzle": 0.4,
+                    "hotend": "rapido_ace_hf",
+                    "nozzle_material": "copper_steel",
+                    "nozzle_type": "standard",
+                    "extruder_type": "direct",
+                    "extruder_name": "hgx_lite"
+                },
+                "pa_info": {
+                    "pa_type": "nonlinear",
+                    "pressure_advance_model": "recipr",
+                    "linear_advance": 0.0193,
+                    "nonlinear_offset": 0.1108,
+                    "linearization_velocity": 1.0734,
+                    "pressure_advance_smooth_time": 0.02,
+                    "pressure_advance_time_offset": 0.0018,
+                    "pa_test_info": {
+                        "automatic": "rubidium"
+                    }
+                },
+                "filament": {
+                    "type": "abs",
+                    "temp": 255,
+                    "manufacturer": "filamentworld",
+                    "color": "yellow",
+                    "diameter": 1.75
+                }
+            },
+            {
+                "source": "contomo",
+                "printer": "v2.4_stealthchanger",
+                "date": "08.01.2025",
+                "tool_info": {
+                    "nozzle": 0.4,
+                    "hotend": "rapido_ace_hf",
+                    "nozzle_material": "copper_steel",
+                    "nozzle_type": "standard",
+                    "extruder_type": "direct",
+                    "extruder_name": "hgx_lite"
+                },
+                "pa_info": {
+                    "pa_type": "nonlinear",
+                    "pressure_advance_model": "recipr",
+                    "linear_advance": 0.0193,
+                    "nonlinear_offset": 0.2240,
+                    "linearization_velocity": 1.0734,
+                    "pressure_advance_smooth_time": 0.02,
+                    "pressure_advance_time_offset": 0.0018,
+                    "pa_test_info": {
+                        "automatic": "rubidium"
+                    }
+                },
+                "filament": {
+                    "type": "abs",
+                    "temp": 255,
+                    "manufacturer": "filamentworld",
+                    "color": "white",
+                    "diameter": 1.75
+                }
+            },
+            {
+            "source": "contomo",
+            "printer": "v2.4_stealthchanger",
+            "date": "03.01.2025",
+            "tool_info": {
+                "nozzle": 0.4,
+                "hotend": "rapido_ace_hf",
+                "nozzle_material": "diamondback",
+                "nozzle_type": "standard",
+                "extruder_type": "direct",
+                "extruder_name": "hgx_lite"
+            },
+            "pa_info": {
+                "pa_type": "nonlinear",
+                "pressure_advance_model": "recipr",
+                "linear_advance": 0.0147,
+                "nonlinear_offset": 0.257,
+                "linearization_velocity": 0.85,
+                "pressure_advance_smooth_time": 0.02,
+                "pressure_advance_time_offset": 0.0018,
+                "pa_test_info": {
+                    "automatic": "rubidium"
+                }
+            },
+            "filament": {
+                "type": "pet-cf",
+                "temp": 270,
+                "manufacturer": "sunlu",
+                "color": "black",
+                "diameter": 1.75
+            }
+        },
+        {
+            "source": "contomo",
+            "printer": "v2.4_stealthchanger",
+            "date": "25.12.2025",
+            "tool_info": {
+                "nozzle": 0.4,
+                "hotend": "rapido_ace_hf",
+                "nozzle_material": "copper_steel",
+                "nozzle_type": "standard",
+                "extruder_type": "direct",
+                "extruder_name": "hgx_lite"
+            },
+            "pa_info": {
+                "pa_type": "nonlinear",
+                "pressure_advance_model": "tanh",
+                "linear_advance": 0.062168,
+                "nonlinear_offset": 0.24749,
+                "linearization_velocity": 0.667660,
+                "pressure_advance_smooth_time": 0.02,
+                "pressure_advance_time_offset": 0.0017,
+                "pa_test_info": {
+                    "automatic": "rubidium"
+                }
+            },
+            "filament": {
+                "type": "petg",
+                "temp": 235,
+                "manufacturer": "sunlu",
+                "color": "grey",
+                "diameter": 1.75,
+                "notes": "Fairly okay id say, PETG just never seems to approximated well enough with tanh or recipricol"
+            }
+        },
+        {
+            "source": "contomo",
+            "printer": "v2.4_stealthchanger",
+            "date": "24.12.2025",
+            "tool_info": {
+                "nozzle": 0.4,
+                "hotend": "rapido_ace_hf",
+                "nozzle_material": "copper_steel",
+                "nozzle_type": "standard",
+                "extruder_type": "direct",
+                "extruder_name": "hgx_lite"
+            },
+            "pa_info": {
+                "pa_type": "nonlinear",
+                "pressure_advance_model": "recipr",
+                "linear_advance": 0.062168,
+                "nonlinear_offset": 0.28,
+                "linearization_velocity": 1.085,
+                "pressure_advance_smooth_time": 0.02,
+                "pressure_advance_time_offset": 0.0017,
+                "pa_test_info": {
+                    "automatic": "rubidium"
+                }
+            },
+            "filament": {
+                "type": "petg",
+                "temp": 235,
+                "manufacturer": "generic",
+                "color": "grey",
+                "diameter": 1.75,
+                "notes": "not the best model for it... prints horrid.\nVery translucent, no colorant at all. Cheapest generic chinese crap"
+            }
+        },
+        {
+            "source": "contomo",
+            "printer": "v2.4_stealthchanger",
+            "date": "08.12.2025",
+            "tool_info": {
+                "nozzle": 0.4,
+                "hotend": "rapido_ace_hf",
+                "nozzle_material": "copper_steel",
+                "nozzle_type": "standard",
+                "extruder_type": "direct",
+                "extruder_name": "hgx_lite"
+            },
+            "pa_info": {
+                "pa_type": "nonlinear",
+                "pressure_advance_model": "recipr",
+                "linear_advance": 0.0818,
+                "nonlinear_offset": 0.3320,
+                "linearization_velocity": 0.8785,
+                "pressure_advance_smooth_time": 0.02,
+                "pressure_advance_time_offset": 0.0017,
+                "pa_test_info": {
+                    "acceleration": 5000,
+                    "layer_height": 0.2,
+                    "perimeters": 2,
+                    "slow_velocity": 20,
+                    "medium_velocity": 120,
+                    "fast_velocity": 300
+                }
+            },
+            "filament": {
+                "type": "petg",
+                "temp": 235,
+                "manufacturer": "generic",
+                "color": "grey",
+                "diameter": 1.75,
+                "notes": "not the best model for it... prints horrid.\nVery translucent, no colorant at all. Cheapest generic chinese crap"
+            }
+        },
+        {
+            "source": "contomo",
+            "printer": "v2.4_stealthchanger",
+            "date": "21.11.2025",
+            "tool_info": {
+                "nozzle": 0.4,
+                "hotend": "rapido_2_hf",
+                "nozzle_material": "copper_steel",
+                "nozzle_type": "standard",
+                "extruder_type": "direct",
+                "extruder_name": "hgx_lite"
+            },
+            "pa_info": {
+                "pa_type": "nonlinear",
+                "pressure_advance_model": "recipr",
+                "linear_advance": 0.0258,
+                "nonlinear_offset": 0.1522,
+                "linearization_velocity": 0.7,
+                "pressure_advance_smooth_time": 0.02,
+                "pressure_advance_time_offset": 0.0017,
+                "pa_test_info": {
+                    "acceleration": 5000,
+                    "layer_height": 0.2,
+                    "perimeters": 2,
+                    "slow_velocity": 20,
+                    "medium_velocity": 60,
+                    "fast_velocity": 100
+                }
+            },
+            "filament": {
+                "type": "pps-cf",
+                "temp": 330,
+                "manufacturer": "bambu-lab",
+                "color": "black",
+                "diameter": 1.75
+            }
+        },
+        {
+            "source": "contomo",
+            "printer": "v2.4_stealthchanger",
+            "date": "13.11.2025",
+            "tool_info": {
+                "nozzle": 0.4,
+                "hotend": "rapido_ace_hf",
+                "nozzle_material": "diamondback",
+                "nozzle_type": "standard",
+                "extruder_type": "direct",
+                "extruder_name": "hgx_lite"
+            },
+            "pa_info": {
+                "pa_type": "nonlinear",
+                "pressure_advance_model": "recipr",
+                "linear_advance": 0.0147,
+                "nonlinear_offset": 0.2210,
+                "linearization_velocity": 0.8,
+                "pressure_advance_smooth_time": 0.02,
+                "pressure_advance_time_offset": 0.0017,
+                "pa_test_info": {
+                    "acceleration": 5000,
+                    "layer_height": 0.2,
+                    "perimeters": 2,
+                    "slow_velocity": 20,
+                    "medium_velocity": 120,
+                    "fast_velocity": 250
+                }
+            },
+            "filament": {
+                "type": "abs-cf",
+                "temp": 255,
+                "manufacturer": "eryone",
+                "color": "black",
+                "diameter": 1.75,
+                "notes": "Tuned to perfection, prints very nicely!\nTheir (eryone's) filaments always seem to offer a tradeoff between mechanical properties and printability tho."
+            }
+        },
+        {
+            "source": "contomo",
+            "printer": "v2.4_stealthchanger",
+            "tool_info": {
+                "nozzle": 0.4,
+                "hotend": "rapido_2_hf",
+                "nozzle_material": "copper_steel",
+                "nozzle_type": "standard",
+                "extruder_type": "direct",
+                "extruder_name": "hgx_lite"
+            },
+            "pa_info": {
+                "pa_type": "nonlinear",
+                "pressure_advance_model": "recipr",
+                "linear_advance": 0.021,
+                "nonlinear_offset": 0.3738,
+                "linearization_velocity": 1.28,
+                "pressure_advance_smooth_time": 0.02,
+                "pressure_advance_time_offset": 0.0017,
+                "pa_test_info": {
+                    "acceleration": 5000,
+                    "layer_height": 0.2,
+                    "perimeters": 2,
+                    "slow_velocity": 20,
+                    "medium_velocity": 120,
+                    "fast_velocity": 250
+                }
+            },
+            "filament": {
+                "type": "cr-petg",
+                "temp": 235,
+                "manufacturer": "creality",
+                "color": "white",
+                "diameter": 1.75
+            }
+        },
+        {
+            "source": "contomo",
+            "printer": "v2.4_stealthchanger",
+            "tool_info": {
+                "nozzle": 0.4,
+                "hotend": "rapido_2_hf",
+                "nozzle_material": "copper_steel",
+                "nozzle_type": "standard",
+                "extruder_type": "direct",
+                "extruder_name": "hgx_lite"
+            },
+            "pa_info": {
+                "pa_type": "nonlinear",
+                "pressure_advance_model": "recipr",
+                "linear_advance":0.0158,
+                "nonlinear_offset": 0.1980,
+                "linearization_velocity": 1.1,
+                "pressure_advance_smooth_time": 0.02,
+                "pressure_advance_time_offset": 0.0018,
+                "pa_test_info": {
+                    "acceleration": 7000,
+                    "layer_height": 0.2,
+                    "perimeters": 2,
+                    "slow_velocity": 20,
+                    "medium_velocity": 120,
+                    "fast_velocity": 250
+                }
+            },
+            "filament": {
+                "type": "pla",
+                "temp": 215,
+                "manufacturer": "unknown",
+                "color": "melonengelb",
+                "diameter": 1.75
+            }
+        },
+        {
+            "source": "contomo",
+            "printer": "v2.4_stealthchanger",
+            "tool_info": {
+                "nozzle": 0.4,
+                "hotend": "rapido_2_hf",
+                "nozzle_material": "diamondback",
+                "nozzle_type": "standard",
+                "extruder_type": "direct",
+                "extruder_name": "hgx_lite"
+            },
+            "pa_info": {
+                "pa_type": "nonlinear",
+                "pressure_advance_model": "tanh",
+                "linear_advance": 0.0149,
+                "nonlinear_offset": 0.1250,
+                "linearization_velocity": 1.62,
+                "pressure_advance_smooth_time": 0.02,
+                "pressure_advance_time_offset": 0.0018,
+                "pa_test_info": {
+                    "acceleration": 7000,
+                    "layer_height": 0.2,
+                    "perimeters": 2,
+                    "slow_velocity": 20,
+                    "medium_velocity": 120,
+                    "fast_velocity": 250
+                }
+            },
+            "filament": {
+                "type": "abs",
+                "temp": 255,
+                "manufacturer": "r3d_filament",
+                "color": "transparent_light_blue",
+                "diameter": 1.75
+            }
+        },
+        {
+            "source": "contomo",
+            "printer": "v2.4_stealthchanger",
+            "tool_info": {
+                "nozzle": 0.4,
+                "hotend": "rapido_2_hf",
+                "nozzle_material": "copper_steel",
+                "nozzle_type": "standard",
+                "extruder_type": "direct",
+                "extruder_name": "hgx_lite"
+            },
+            "pa_info": {
+                "pa_type": "nonlinear",
+                "pressure_advance_model": "tanh",
+                "linear_advance": 0.0193,
+                "nonlinear_offset": 0.09,
+                "linearization_velocity": 1.0,
+                "pressure_advance_smooth_time": 0.02,
+                "pressure_advance_time_offset": 0.0018,
+                "pa_test_info": {
+                    "acceleration": 10000,
+                    "layer_height": 0.2,
+                    "perimeters": 2,
+                    "slow_velocity": 20,
+                    "medium_velocity": 120,
+                    "fast_velocity": 350
+                }
+            },
+            "filament": {
+                "type": "abs",
+                "temp": 255,
+                "manufacturer": "r3d_filament",
+                "color": "transparent_light_blue",
+                "diameter": 1.75
+            }
+        },
+        {
+            "source": "contomo",
+            "printer": "v2.4_stealthchanger",
+            "tool_info": {
+                "nozzle": 0.4,
+                "hotend": "tz_volcano",
+                "nozzle_material": "copper_steel",
+                "nozzle_type": "volcano",
+                "extruder_type": "direct",
+                "extruder_name": "hgx_lite"
+            },
+            "pa_info": {
+                "pa_type": "nonlinear",
+                "pressure_advance_model": "tanh",
+                "linear_advance": 0.0168,
+                "nonlinear_offset": 0.1283,
+                "linearization_velocity": 1.2,
+                "pressure_advance_smooth_time": 0.02,
+                "pressure_advance_time_offset": 0.0019,
+                "pa_test_info": {
+                    "acceleration": 10000,
+                    "layer_height": 0.2,
+                    "perimeters": 2,
+                    "slow_velocity": 20,
+                    "medium_velocity": 120,
+                    "fast_velocity": 250
+                }
+            },
+            "filament": {
+                "type": "abs",
+                "temp": 255,
+                "manufacturer": "r3d_filament",
+                "color": "transparent_light_blue",
+                "diameter": 1.75
+            }
+        },            {
+            "source": "patrezp",
+            "printer": "v2.4_stealthchanger",
+            "date": "12_05_2025",
+            "tool_info": {
+                "nozzle": 0.4,
+                "hotend": "nf_crazy",
+                "nozzle_material": "carbide",
+                "nozzle_type": "volcano",
+                "extruder_type": "direct",
+                "extruder_name": "g2sa"
+            },
+            "pa_info": {
+                "pa_type": "nonlinear",
+                "pressure_advance_model": "tanh",
+                "linear_advance": 0.055,
+                "nonlinear_offset": 0.125,
+                "linearization_velocity": 1.5,
+                "pressure_advance_smooth_time": 0.020,
+                "pressure_advance_time_offset": 0.0005,
+                "pa_test_info": {
+                    "acceleration": 3000,
+                    "layer_height": 0.25,
+                    "perimeters": 1,
+                    "slow_velocity": 20,
+                    "medium_velocity": 160,
+                    "fast_velocity": 350
+                }
+            },
+            "filament": {
+                "type": "pla",
+                "temp": "225",
+                "manufacturer": "3d kordo",
+                "color": "white",
+                "diameter": 1.75,
+                "notes": "None"
+            }
+        },
+        {
+            "source": "patrezp",
+            "printer": "v2.4_stealthchanger",
+            "date": "12_05_2025",
+            "tool_info": {
+                "nozzle": 0.4,
+                "hotend": "nf_crazy",
+                "nozzle_material": "brass",
+                "nozzle_type": "volcano_extender",
+                "extruder_type": "direct",
+                "extruder_name": "g2sa"
+            },
+            "pa_info": {
+                "pa_type": "nonlinear",
+                "pressure_advance_model": "tanh",
+                "linear_advance": 0.05016,
+                "nonlinear_offset": 0.0584,
+                "linearization_velocity": 1.5,
+                "pressure_advance_smooth_time": 0.020,
+                "pressure_advance_time_offset": 0.0045,
+                "pa_test_info": {
+                    "acceleration": 3000,
+                    "layer_height": 0.25,
+                    "perimeters": 1,
+                    "slow_velocity": 20,
+                    "medium_velocity": 160,
+                    "fast_velocity": 350
+                }
+            },
+            "filament": {
+                "type": "pla",
+                "temp": "225",
+                "manufacturer": "3d kordo",
+                "color": "white",
+                "diameter": 1.75,
+                "notes": "None"
+            }
+        },
+        {
+            "source": "patrezp",
+            "printer": "v2.4_stealthchanger",
+            "date": "12_05_2025",
+            "tool_info": {
+                "nozzle": 0.4,
+                "hotend": "nf_crazy",
+                "nozzle_material": "brass",
+                "nozzle_type": "volcano_extender",
+                "extruder_type": "direct",
+                "extruder_name": "g2sa"
+            },
+            "pa_info": {
+                "pa_type": "nonlinear",
+                "pressure_advance_model": "tanh",
+                "linear_advance": 0.045528,
+                "nonlinear_offset": 0.109,
+                "linearization_velocity": 1.5,
+                "pressure_advance_smooth_time": 0.020,
+                "pressure_advance_time_offset": 0.0019,
+                "pa_test_info": {
+                    "acceleration": 3000,
+                    "layer_height": 0.25,
+                    "perimeters": 1,
+                    "slow_velocity": 20,
+                    "medium_velocity": 160,
+                    "fast_velocity": 350
+                }
+            },
+            "filament": {
+                "type": "pla",
+                "temp": "225",
+                "manufacturer": "3d kordo",
+                "color": "white",
+                "diameter": 1.75,
+                "notes": "None"
+            }
+        },
+        {
+            "source": "contomo",
+            "printer": "v2.4_stealthchanger",
+            "tool_info": {
+                "nozzle": 0.4,
+                "hotend": "tz_volcano",
+                "nozzle_material": "copper_steel",
+                "nozzle_type": "volcano",
+                "extruder_type": "direct",
+                "extruder_name": "hgx_lite"
+            },
+            "pa_info": {
+                "pa_type": "nonlinear",
+                "pressure_advance_model": "tanh",
+                "linear_advance": 0.0144,
+                "nonlinear_offset": 0.084,
+                "linearization_velocity": 1.1,
+                "pressure_advance_smooth_time": 0.02,
+                "pressure_advance_time_offset": 0.002,
+                "pa_test_info": {
+                    "acceleration": 10000,
+                    "layer_height": 0.2,
+                    "perimeters": 2,
+                    "slow_velocity": 20,
+                    "medium_velocity": 120,
+                    "fast_velocity": 350
+                }
+            },
+            "filament": {
+                "type": "pla_plus",
+                "temp": 215,
+                "manufacturer": "sunlu",
+                "color": "light_gary",
+                "diameter": 1.75
+            }
+        },
+        {
+            "source": "speedkills",
+            "tool_info": {
+                "nozzle": 0.5,
+                "hotend": "chube_conduction",
+                "nozzle_material": "tungsten_carbide",
+                "nozzle_type": "undertaker",
+                "extruder_type": "direct"
+            },
+            "pa_info": {
+                "pa_type": "nonlinear",
+                "pressure_advance_model": "tanh",
+                "linear_advance": 0.015,
+                "nonlinear_offset": 0.12,
+                "linearization_velocity": 3.0,
+                "pressure_advance_smooth_time": 0.02,
+                "pressure_advance_time_offset": 0.0,
+                "pa_test_info": {
+                    "acceleration": 20000,
+                    "slow_velocity": 20,
+                    "medium_velocity": 300,
+                    "fast_velocity": 500
+                }
+            },
+            "filament": {
+                "type": "abs",
+                "diameter": 1.75
+            }
+        },
+        {
+            "source": "carvac",
+            "printer": "the_100",
+            "tool_info": {
+                "nozzle": 0.4,
+                "hotend": "rapido_uhf",
+                "nozzle_material": "brass",
+                "nozzle_type": "cht_volcano",
+                "extruder_type": "bowden"
+            },
+            "pa_info": {
+                "pa_type": "nonlinear",
+                "pressure_advance_model": "tanh",
+                "linear_advance": 0.015,
+                "nonlinear_offset": 0.12,
+                "linearization_velocity": 3.0,
+                "pressure_advance_smooth_time": 0.02,
+                "pressure_advance_time_offset": 0.0,
+                "pa_test_info": {
+                    "acceleration": 20000,
+                    "slow_velocity": 20,
+                    "medium_velocity": 300,
+                    "fast_velocity": 500
+                }
+            },
+            "filament": {
+                "type": "abs",
+                "diameter": 1.75
+            }
+        },
+        {
+            "source": "carvac",
+            "printer": "the_100",
+            "tool_info": {
+                "extruder_type": "bowden",
+                "hotend": "rapido_uhf",
+                "nozzle": 0.4,
+                "nozzle_type": "cht_volcano",
+                "nozzle_material": "brass"
+            },
+            "pa_info": {
+                "pa_type": "nonlinear",
+                "pressure_advance_model": "tanh",
+                "linear_advance": 0.17,
+                "nonlinear_offset": 0.7,
+                "linearization_velocity": 3.0,
+                "pressure_advance_smooth_time": 0.02,
+                "pressure_advance_time_offset": 0.003,
+                "pa_test_info": {
+                    "slow_velocity": 20.0,
+                    "medium_velocity": 100.0,
+                    "fast_velocity": 300.0,
+                    "acceleration": 50000
+                }
+            },
+            "filament": {
+                "type": "pla",
+                "diameter": 1.75,
+                "manufacturer": "Hatchbox",
+                "temp": 230
+            }
+        },
+        {
+            "source": "carvac",
+            "printer": "the_100",
+            "tool_info": {
+                "extruder_type": "bowden",
+                "hotend": "rapido_uhf",
+                "nozzle": 0.4,
+                "nozzle_type": "cht_volcano",
+                "nozzle_material": "brass"
+            },
+            "pa_info": {
+                "pa_type": "nonlinear",
+                "pressure_advance_model": "tanh",
+                "linear_advance": 0.18,
+                "nonlinear_offset": 0.7,
+                "linearization_velocity": 3.0,
+                "pressure_advance_smooth_time": 0.02,
+                "pressure_advance_time_offset": 0.0023,
+                "pa_test_info": {
+                    "slow_velocity": 20.0,
+                    "medium_velocity": 100.0,
+                    "fast_velocity": 400.0,
+                    "acceleration": 50000
+                }
+            },
+            "filament": {
+                "type": "pla",
+                "diameter": 1.75,
+                "manufacturer": "Kingroon",
+                "temp": 230
+            }
+        },
+        {
+            "source": "carvac",
+            "printer": "the_100",
+            "tool_info": {
+                "extruder_type": "bowden",
+                "hotend": "rapido_uhf",
+                "nozzle": 0.4,
+                "nozzle_type": "cht_volcano",
+                "nozzle_material": "brass"
+            },
+            "pa_info": {
+                "pa_type": "nonlinear",
+                "pressure_advance_model": "tanh",
+                "linear_advance": 0.13,
+                "nonlinear_offset": 0.66,
+                "linearization_velocity": 3.0,
+                "pressure_advance_smooth_time": 0.02,
+                "pressure_advance_time_offset": 0.018,
+                "pa_test_info": {
+                    "slow_velocity": 20.0,
+                    "medium_velocity": 100.0,
+                    "fast_velocity": 400.0,
+                    "acceleration": 50000
+                }
+            },
+            "filament": {
+                "type": "pla",
+                "diameter": 1.75,
+                "manufacturer": "Kingroon",
+                "temp": 230
+            }
+        },
+        {
+            "source": "carvac",
+            "printer": "sv06_plus",
+            "tool_info": {
+                "extruder_type": "direct",
+                "hotend": "volcano",
+                "nozzle": 0.4,
+                "nozzle_type": "volcano",
+                "nozzle_material": "brass"
+            },
+            "pa_info": {
+                "pa_type": "nonlinear",
+                "pressure_advance_model": "tanh",
+                "linear_advance": 0.017,
+                "nonlinear_offset": 0.12,
+                "linearization_velocity": 1.0,
+                "pressure_advance_smooth_time": 0.02,
+                "pressure_advance_time_offset": 0.0018,
+                "pa_test_info": {
+                    "slow_velocity": 20.0,
+                    "medium_velocity": 50.0,
+                    "fast_velocity": 150.0,
+                    "acceleration": 5000
+                }
+            },
+            "filament": {
+                "type": "pla",
+                "diameter": 1.75,
+                "manufacturer": "Inland",
+                "temp": 215
+            }
+        },
+        {
+            "source": "carvac",
+            "printer": "kingroon_klp1",
+            "tool_info": {
+                "extruder_type": "bowden",
+                "hotend": "dragon_ace",
+                "nozzle": 0.4,
+                "nozzle_type": "cht_v6"
+            },
+            "pa_info": {
+                "pa_type": "nonlinear",
+                "pressure_advance_model": "tanh",
+                "linear_advance": 0.45,
+                "nonlinear_offset": 0.6,
+                "linearization_velocity": 3.0,
+                "pressure_advance_smooth_time": 0.02,
+                "pressure_advance_time_offset": 0.004,
+                "pa_test_info": {
+                    "slow_velocity": 20.0,
+                    "medium_velocity": 50.0,
+                    "fast_velocity": 300.0,
+                    "acceleration": 10000
+                }
+            },
+            "filament": {
+                "type": "asa",
+                "color": "natural",
+                "diameter": 1.75,
+                "manufacturer": "Inland",
+                "temp": 250
+            }
+        }
+    ]
+}

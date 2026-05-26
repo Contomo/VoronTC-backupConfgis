@@ -1,0 +1,789 @@
+
+
+# {% macro _key_from_point(p) %}{ p[0]|round(4) ~ ',' ~ p[1]|round(4) }{% endmacro %}
+
+# OLD BUT GOOD FOR GUIDANCE
+# #
+# #{%- macro _angle_deg(ax,ay,bx,by,cx,cy,m) -%}
+#     {%- set ux, uy = ax - bx, ay - by -%}
+#     {%- set vx, vy = cx - bx, cy - by -%}
+#     {%- set dot = ux*vx + uy*vy -%}
+#     {%- set det = ux*vy - uy*vx -%}
+#     {%- set a = m.degrees(m.atan2(det, dot)) -%}
+#     { a if a>=0 else -a }
+# {%- endmacro -%}
+# 
+# {%- macro _simplify_line(line, min_len, angle_keep_deg, m) -%}
+#     {%- if line and (line|length) >= 3 -%}
+#         {%- set out = [] -%}
+#         {%- set _ = out.append(line[0]) -%}
+#         {%- for i in range(1, line|length-1) -%}
+#             {%- set ax, ay = line[i-1][0]|float, line[i-1][1]|float -%}
+#             {%- set bx, by = line[i][0]|float,   line[i][1]|float   -%}
+#             {%- set cx, cy = line[i+1][0]|float, line[i+1][1]|float -%}
+#             {%- set d1 = m.hypot(bx-ax, by-ay) -%}
+#             {%- set d2 = m.hypot(cx-bx, cy-by) -%}
+#             {%- set turn = _angle_deg(ax,ay,bx,by,cx,cy,m)|float -%}
+#             {%- set keep = (d1>=min_len) or (d2>=min_len) or (turn>=angle_keep_deg) -%}
+#             {%- set _ = out.append([bx,by]) if keep -%}
+#         {%- endfor -%}
+#         {%- set _ = out.append(line|last) -%}
+#         {%- set _ = line.clear() -%}
+#         {%- set _ = line.extend(out) -%}
+#     {%- endif -%}
+# {%- endmacro -%}
+# 
+# {%- macro _densify_line(line, max_len, m) -%}
+#     {%- for idx in range(line|length - 1, 0, -1) if line and (line|length) >= 2 -%}
+#         {%- set ax, ay = line[idx-1][0]|float, line[idx-1][1]|float -%}
+#         {%- set bx, by = line[idx][0]|float,   line[idx][1]|float   -%}
+#         {%- set dx, dy = bx-ax, by-ay -%}
+#         {%- set dist   = m.hypot(dx, dy) -%}
+#         {%- if dist > max_len -%}
+#             {%- set steps = (dist/max_len)|round(0,'ceil')|int - 1 -%}
+#             {%- for k in range(steps, 0, -1) if steps >= 1 -%}
+#                 {%- set t = (k / (steps + 1)) -%}
+#                 {%- set nx = ax + dx*t -%}
+#                 {%- set ny = ay + dy*t -%}
+#                 {%- set _ = line.insert(idx, [nx, ny]) -%}
+#             {%- endfor -%}
+#         {%- endif -%}
+#     {%- endfor -%}
+# {%- endmacro -%}
+# 
+# {%- macro _round_line(line, dec) -%}
+#     {%- for i in range(line|length) if dec is not none and line and (line|length) >= 1 -%}
+#         {%- set x = line[i][0]|round(dec) -%}
+#         {%- set y = line[i][1]|round(dec) -%}
+#         {%- set _ = line.__setitem__(i, [x,y]) -%}
+#     {%- endfor -%}
+# {%- endmacro -%}
+# 
+#
+#
+#    {%- macro draw_bed(w, h, pad=0, size=12, thick=1.0) -%}
+#    # todo -> remove
+#        {%- set elements = [] -%}
+#        {%- set _ = elements.append(
+#            '<rect x="' ~ pad ~ '" y="' ~ pad ~ '" width="' ~ w ~ '" height="' ~ h ~
+#            '" fill="var(--p-background-darker)" stroke="var(--p-border)" stroke-width="' ~
+#            (thick * 0.50)|round(3) ~ '" vector-effect="non-scaling-stroke" />'
+#        ) -%}
+#        {%- set corners = [
+#            {'x': pad,       'y': pad,       'hx': size,  'hy': 0.0,  'vx': 0.0,  'vy': size},
+#            {'x': pad,       'y': h + pad,   'hx': size,  'hy': 0.0,  'vx': 0.0,  'vy': -size},
+#            {'x': w + pad,   'y': pad,       'hx': -size, 'hy': 0.0,  'vx': 0.0,  'vy': size},
+#            {'x': w + pad,   'y': h + pad,   'hx': -size, 'hy': 0.0,  'vx': 0.0,  'vy': -size},
+#        ] -%}
+#        {%- for c in corners -%}
+#            {%- set _stroke = '" stroke="var(--p-text-color)" stroke-width="' ~ thick -%}
+#            {%- set _ = elements.append('<line x1="' ~ c.x|round(3) ~ '" y1="' ~ c.y|round(3) ~ '" x2="' ~ (c.x + c.hx)|round(3) ~ '" y2="' ~ (c.y + c.hy)|round(3) ~ _stroke ~ '" />') -%}
+#            {%- set _ = elements.append('<line x1="' ~ c.x|round(3) ~ '" y1="' ~ c.y|round(3) ~ '" x2="' ~ (c.x + c.vx)|round(3) ~ '" y2="' ~ (c.y + c.vy)|round(3) ~ _stroke ~ '" />') -%}
+#        {%- endfor -%}
+#        {%- set cx, cy = pad + (w / 2.0), pad + (h / 2.0) -%}
+#        {%- set cx, cy = X + pad, (h + pad) - Y -%}
+#        {%- set cross = size * 0.4 -%}
+#        {%- set _stroke = '" stroke="var(--p-text-color)" stroke-width="' ~ (thick * 0.75)|round(3) -%}
+#        {%- set _ = elements.append('<line x1="' ~ (cx - cross)|round(3) ~ '" y1="' ~ cy|round(3) ~ '" x2="' ~ (cx + cross)|round(3) ~ '" y2="' ~ cy|round(3) ~ _stroke ~ '" />') -%}
+#        {%- set _ = elements.append('<line x1="' ~ cx|round(3) ~ '" y1="' ~ (cy - cross)|round(3) ~ '" x2="' ~ cx|round(3) ~ '" y2="' ~ (cy + cross)|round(3) ~ _stroke ~ '" />') -%}
+#        { elements|join('') }
+#    {%- endmacro -%}
+#
+#    {%- macro draw_polygon(poly, pad=0.0, max_h=0.0, fill_color="none") -%}
+#    # todo -> remove
+#        {%- set pts = [] -%}
+#        {%- for p in poly -%}
+#            {%- set xv = (p[0] + pad)|round(3) -%}
+#            {%- set yv = (max_h - p[1] + pad)|round(3) -%}
+#            {%- set _  = pts.append(xv ~ ',' ~ yv) -%}
+#        {%- endfor -%}
+#        { '<polygon points="' ~ pts|join(' ') ~ '" stroke="var(--p-text-color2)" fill="' ~ fill_color ~ '" stroke-width="1" />' }
+#    {%- endmacro -%}
+#
+#    {%- macro draw_polyline(points, pad=0.0, max_h=0.0, color='red', thick=0.6) -%}
+#    # todo -> remove
+#        {%- set pts = [] -%}
+#        {%- for p in points -%}
+#            {%- set xv = (p[0] + pad)|round(3) -%}
+#            {%- set yv = (max_h - p[1] + pad)|round(3) -%}
+#            {%- set _  = pts.append(xv ~ ',' ~ yv) -%}
+#        {%- endfor -%}
+#        { '<polyline points="' ~ pts|join(' ') ~ '" stroke="' ~ color ~ '" fill="none" stroke-width="' ~ thick ~ '" stroke-linecap="round" stroke-linejoin="round" />' }
+#    {%- endmacro -%}
+#
+#    {%- macro draw_svg(objs, w, h, pad=0.0, max_size=400) -%}
+#        # todo -> remove
+#        {%- set total_w = (w + pad * 2)|round(0, 'floor')|int -%}
+#        {%- set total_h = (h + pad * 2)|round(0, 'floor')|int -%}
+#        {%- set svg = [] -%}
+#
+#        {%- set _ = svg.append(
+#        '<div class="svg_click_open" title="Click to open full-size" ' ~
+#        'style="max-inline-size:' ~ max_size ~ 'px; max-block-size:' ~ max_size ~ 'px; inline-size:100%; background:var(--p-background-darker); cursor:zoom-in;">'
+#        ) -%}
+#
+#        {%- set _ = svg.append(
+#        '<div style="inline-size:100%; aspect-ratio:1/1;">'
+#        ) -%}
+#
+#        {%- set _ = svg.append(
+#        '<svg xmlns="http://www.w3.org/2000/svg" ' ~
+#            'viewBox="0 0 ' ~ total_w ~ ' ' ~ total_h ~ '" ' ~
+#            'preserveAspectRatio="xMidYMid meet" ' ~
+#            'style="display:block;inline-size:100%;block-size:100%;">'
+#        ) -%}
+#
+#        {%- set _ = svg.append(draw_bed(w, h, pad, size=12, thick=1.0)) -%}
+#        {%- for obj in objs if 'polygon' in obj -%}
+#            {%- set _polygon = obj.polygon -%}
+#            {%- set fillc = poly_palette[loop.index0 % (poly_palette|length)] -%}
+#            {%- set _ = svg.append(draw_polygon(_polygon, pad, h, fillc)) -%}
+#        {%- endfor -%}
+#        {%- for obj in objs if 'polyline' in obj -%}
+#            {%- set color = obj.color|d(lines_palette[loop.index0 % (lines_palette|length)]) -%}
+#            {%- set thick = obj.thick|d(0.6)|float -%}
+#            {%- set _ = svg.append(draw_polyline(obj.polyline, pad, h, color, thick)) -%}
+#        {%- endfor -%}
+#
+#        {%- set _ = svg.append('</svg>') -%}
+#
+#        {%- set js %}{% raw %}
+#        (function(img){
+#        try{
+#            var box = img.closest('.svg_click_open');
+#            if (box==null){ img.remove(); return; }
+#            if (box.dataset && box.dataset.bound){ img.remove(); return; }
+#            box.dataset.bound='1';
+#
+#            var theme = box.closest('.theme--dark') || document.body;
+#
+#            function copyAllCustomProps(fromEl,toEl){
+#            try{
+#                var cs = getComputedStyle(fromEl);
+#                for (var i=0;i<cs.length;i++){
+#                var name = cs[i];
+#                if (name && name.indexOf('--')===0){
+#                    var v = cs.getPropertyValue(name);
+#                    if (v){ toEl.style.setProperty(name, v.trim()); }
+#                }
+#                }
+#            }catch(e){}
+#            }
+#
+#            box.addEventListener('click', function(){
+#            try{
+#                var s = box.querySelector('svg'); if (s==null) return;
+#
+#                var vb = s.viewBox && s.viewBox.baseVal ? s.viewBox.baseVal : null;
+#                var vw0 = vb ? vb.width  : 1000;
+#                var vh0 = vb ? vb.height : 1000;
+#
+#                var clone = s.cloneNode(true);
+#                clone.removeAttribute('style');
+#                clone.setAttribute('style','display:block;width:100%;height:100%');
+#
+#                var panel = document.createElement('div');
+#                panel.setAttribute('style',
+#                'position:absolute;left:0;top:0;' +
+#                'display:flex;align-items:center;justify-content:center;' +
+#                'transform-origin:0 0;cursor:auto;'
+#                );
+#                copyAllCustomProps(theme, panel);
+#                panel.appendChild(clone);
+#
+#                var ov = document.createElement('div');
+#                ov.setAttribute('style',
+#                'position:fixed;left:0;top:0;right:0;bottom:0;' +
+#                'background:transparent;overflow:hidden;' +
+#                'z-index:99999;cursor:zoom-out;'
+#                );
+#                copyAllCustomProps(theme, ov);
+#
+#                function fitScale(){
+#                var w = window.innerWidth, h = window.innerHeight;
+#                var k = Math.min(w*0.95/vw0, h*0.95/vh0);
+#                if (!(k>0)) k = 1;
+#                return k;
+#                }
+#
+#                var k = fitScale();
+#                var tx = Math.floor((window.innerWidth  - vw0*k)/2);
+#                var ty = Math.floor((window.innerHeight - vh0*k)/2);
+#
+#                function apply(){
+#                panel.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + k + ')';
+#                panel.style.width  = vw0 + 'px';
+#                panel.style.height = vh0 + 'px';
+#                }
+#                apply();
+#
+#                var dragging=false, lastX=0, lastY=0;
+#
+#                panel.addEventListener('mousedown', function(ev){
+#                try{
+#                    if (ev.button===0){
+#                    dragging=true; lastX=ev.clientX; lastY=ev.clientY;
+#                    panel.style.cursor='grabbing'; ev.preventDefault();
+#                    }
+#                }catch(e){}
+#                });
+#
+#                window.addEventListener('mouseup', function(){
+#                try{
+#                    if (dragging){ dragging=false; panel.style.cursor='auto'; }
+#                }catch(e){}
+#                });
+#
+#                window.addEventListener('mousemove', function(ev){
+#                try{
+#                    if (!dragging) return;
+#                    var dx = ev.clientX - lastX, dy = ev.clientY - lastY;
+#                    lastX = ev.clientX; lastY = ev.clientY;
+#                    tx += dx; ty += dy; apply();
+#                }catch(e){}
+#                });
+#
+#                clone.addEventListener('wheel', function(ev){
+#                try{
+#                    ev.preventDefault();
+#                    var rect = panel.getBoundingClientRect();
+#                    var mx = ev.clientX, my = ev.clientY;
+#                    var u = (mx - rect.left)/k;
+#                    var v = (my - rect.top)/k;
+#                    var step = ev.ctrlKey ? 0.15 : 0.08;
+#                    var factor = ev.deltaY > 0 ? (1+step) : (1-step);
+#                    if (!(factor>0)) factor = 1;
+#                    var k2 = k * factor;
+#                    var tx2 = Math.round(mx - u*k2);
+#                    var ty2 = Math.round(my - v*k2);
+#                    k = Math.max(k2, 0.01);
+#                    tx = tx2; ty = ty2;
+#                    apply();
+#                }catch(e){}
+#                }, {passive:false});
+#
+#                function onResize(){
+#                try{
+#                    var mx = window.innerWidth/2, my = window.innerHeight/2;
+#                    var rect = panel.getBoundingClientRect();
+#                    var u = (mx - rect.left)/k;
+#                    var v = (my - rect.top)/k;
+#                    var k2 = fitScale();
+#                    var tx2 = Math.round(mx - u*k2);
+#                    var ty2 = Math.round(my - v*k2);
+#                    k = k2; tx = tx2; ty = ty2; apply();
+#                }catch(e){}
+#                }
+#
+#                function onKey(e){ if (e && e.key==='Escape') close(); }
+#
+#                function close(){
+#                window.removeEventListener('resize', onResize);
+#                document.removeEventListener('keydown', onKey);
+#                if (ov.parentNode) ov.parentNode.removeChild(ov);
+#                }
+#
+#                ov.addEventListener('click', function(){ close(); });
+#                panel.addEventListener('click', function(e){ e.stopPropagation(); });
+#
+#                window.addEventListener('resize', onResize);
+#                document.addEventListener('keydown', onKey);
+#
+#                ov.appendChild(panel);
+#                theme.appendChild(ov);
+#            }catch(e){}
+#            });
+#        }catch(e){} finally{ img.remove(); }
+#        })(this)
+#        {% endraw %}{% endset %}
+#
+#        {%- set _ = svg.append('<img src=x style="display:none" onerror="' ~ js|replace('\n', '') ~ '">') -%}
+#        {%- set _ = svg.append('</div>') -%}
+#        {%- set _ = svg.append('</div>') -%}
+#        { svg|join('') }
+#    {%- endmacro -%}
+#
+#
+#
+#    {%- macro _attr_pair(name, val) -%}
+#        {%- if val and val|string|trim -%}
+#            { ' ' ~ name ~ '="' ~ val ~ '"' }
+#        {%- endif -%}
+#    {%- endmacro -%}
+#
+#    {%- macro stroke_attrs(stroke=None, width=None, opacity=None, linecap=None, linejoin=None, miterlimit=None, dasharray=None, dashoffset=None, vector_effect=None) -%}
+#        {-
+#            _attr_pair('stroke', stroke) ~
+#            _attr_pair('stroke-width', width) ~
+#            _attr_pair('stroke-opacity', opacity) ~
+#            _attr_pair('stroke-linecap', linecap) ~
+#            _attr_pair('stroke-linejoin', linejoin) ~
+#            _attr_pair('stroke-miterlimit', miterlimit) ~
+#            _attr_pair('stroke-dasharray', dasharray) ~
+#            _attr_pair('stroke-dashoffset', dashoffset) ~
+#            _attr_pair('vector-effect', vector_effect)
+#        -}
+#    {%- endmacro -%}
+#
+#    {%- macro fill_attrs(fill=None, opacity=None, rule=None) -%}
+#        {-
+#            _attr_pair('fill', fill) ~
+#            _attr_pair('fill-opacity', opacity) ~
+#            _attr_pair('fill-rule', rule)
+#        -}
+#    {%- endmacro -%}
+#
+#    {%- macro svg_attrs(stroke=None, stroke_width=None, stroke_opacity=None, fill=None, fill_opacity=None, linecap=None, linejoin=None, dasharray=None, dashoffset=None, vector_effect=None) -%}
+#        {-
+#            stroke_attrs(stroke, stroke_width, stroke_opacity, linecap, linejoin, none, dasharray, dashoffset, vector_effect) ~
+#            fill_attrs(fill, fill_opacity, none)
+#        -}
+#    {%- endmacro -%}
+#
+#
+#
+#
+#    {% macro offset_obj_outline_old_working(obj, offset=0.0, name='polygon') %}
+#        {% set poly = obj.polygon %}
+#        {% if (poly|length) >= 3 and (offset|abs) > EPSILON %}
+#            {% set shifted = [] %}
+#            {% for i in range(poly|length) %}
+#                {% set p1 = poly[i] %}
+#                {% set p2 = poly[(i + 1) % (poly|length)] %}
+#                {% set dx = p2[0] - p1[0] %}
+#                {% set dy = p2[1] - p1[1] %}
+#                {% set L  = (dx**2 + dy**2)**0.5 %}
+#                {% if L > EPSILON %}
+#                    {% set nx = ( obj.orientation * dy) / L %}
+#                    {% set ny = (-obj.orientation * dx) / L %}
+#                    {% set _ = shifted.append({
+#                        'x1': p1[0] + nx * offset,
+#                        'y1': p1[1] + ny * offset,
+#                        'x2': p2[0] + nx * offset,
+#                        'y2': p2[1] + ny * offset
+#                    }) %}
+#                {% endif %}
+#            {% endfor %}
+#            {% set new_pts = [] %}
+#            {% for i in range(shifted|length) if shifted|length >= 2 %}
+#                {% set A = shifted[(i - 1) % (shifted|length)] %}
+#                {% set B = shifted[i] %}
+#                {% set ax, ay = A.x1 - A.x2, A.y1 - A.y2 %}
+#                {% set bx, by = B.x1 - B.x2, B.y1 - B.y2 %}
+#                {% set denom = (ax*by - ay*bx) %}
+#                {% if denom|abs > EPSILON %}
+#                    {% set detA = A.x1*A.y2 - A.y1*A.x2 %}
+#                    {% set detB = B.x1*B.y2 - B.y1*B.x2 %}
+#                    {% set px = (detA*bx - ax*detB) / denom %}
+#                    {% set py = (detA*by - ay*detB) / denom %}
+#                {% else %}
+#                    {% set px, py = B.x1, B.y1 %}
+#                {% endif %}
+#                {% set _ = new_pts.append([px|round(3), py|round(3)]) %}
+#            {% endfor %}
+#            {% set _ = obj.update({name: new_pts}) %}
+#        {% endif %}
+#    {% endmacro %}
+
+
+
+
+
+#    {%- macro points_outside_bed(points, max_w, max_h, flags) -%}
+#        {%- macro point_in_bound(p=(0,0)) -%}
+#            {%- if not (p[0] < (bed_min.x - EPSILON)
+#                     or p[0] > (bed_max.x + EPSILON)
+#                     or p[1] < (bed_min.y - EPSILON)
+#                     or p[1] > (bed_max.y + EPSILON)) -%}
+#                True
+#            {%- endif -%}
+#        {%- endmacro -%} 
+#        {%- for pt in points if not point_in_bound(pt) -%}
+#            True
+#        {%- endfor -%}
+#    {%- endmacro -%}
+
+  
+
+
+#    {% macro offset_obj_outline(obj, offset=0.0, name='polygon') %}
+#        {% set poly = obj.polygon %}
+#        {% if (poly|length) >= 3 and (offset|abs) > EPSILON %}
+#            {% set shifted = [] %}
+#            {% for i in range(poly|length) %}
+#                {% set p1 = poly[i] %}
+#                {% set p2 = poly[(i + 1) % (poly|length)] %}
+#                {% set dx = p2[0] - p1[0] %}
+#                {% set dy = p2[1] - p1[1] %}
+#                {% set L  = (dx**2 + dy**2)**0.5 %}
+#                {% if L > EPSILON %}
+#                    {% set nx = ( obj.orientation * dy) / L %}
+#                    {% set ny = (-obj.orientation * dx) / L %}
+#                    {% set _ = shifted.append({
+#                        'x1': p1[0] + nx * offset,
+#                        'y1': p1[1] + ny * offset,
+#                        'x2': p2[0] + nx * offset,
+#                        'y2': p2[1] + ny * offset
+#                    }) %}
+#                {% endif %}
+#            {% endfor %}
+#            {% set new_pts = [] %}
+#            {% for i in range(shifted|length) if shifted|length >= 2 %}
+#                {% set A = shifted[(i - 1) % (shifted|length)] %}
+#                {% set B = shifted[i] %}
+#                {% set ax, ay = A.x1 - A.x2, A.y1 - A.y2 %}
+#                {% set bx, by = B.x1 - B.x2, B.y1 - B.y2 %}
+#                {% set denom = (ax*by - ay*bx) %}
+#                {% if denom|abs > EPSILON %}
+#                    {% set detA = A.x1*A.y2 - A.y1*A.x2 %}
+#                    {% set detB = B.x1*B.y2 - B.y1*B.x2 %}
+#                    {% set px = (detA*bx - ax*detB) / denom %}
+#                    {% set py = (detA*by - ay*detB) / denom %}
+#                {% else %}
+#                    {% set px, py = B.x1, B.y1 %}
+#                {% endif %}
+#                {% set _ = new_pts.append([px|round(3), py|round(3)]) %}
+#            {% endfor %}
+#            {% set _ = obj.update({name: new_pts}) %}
+#        {% endif %}
+#    {% endmacro %}
+
+#    {%- macro ensure_obj_has_orientation(obj) -%}
+#        {%- set snips, poly = [], obj.polygon -%}
+#        {%- for idx in range(poly|length) -%}
+#            {%- set p1 = poly[idx] -%}
+#            {%- set p2 = poly[(idx + 1) % poly|length] -%}
+#            {%- set _ = snips.append((p1[0] * p2[1] - p2[0] * p1[1])) -%}
+#        {%- endfor -%}
+#        {% set _ = obj.update({'orientation': 1 if snips|sum >= 0 else -1}) %}
+#    {%- endmacro -%}
+
+#    {%- macro polyline_length(points=[(0,0)]) -%}
+#        {% set snippets = [] %}
+#            {%- for idx in range(points|length - 1) -%}
+#                {%- set a = points[idx]     -%}
+#                {%- set b = points[idx + 1] -%}
+#                {%- set dx = b[0] - a[0] -%}
+#                {%- set dy = b[1] - a[1] -%}
+#                {%- set _ = snippets.append((dx**2 + dy**2)**0.5) -%}
+#            {%- endfor -%}
+#        { snippets|sum }
+#    {%- endmacro -%}
+
+
+
+
+[gcode_macro _RASTER_TOOLS_OLD]
+gcode:
+    # --- INTERNAL LIBRARY: Not meant for direct execution ---
+    {%- set _ = missing_context_please_import_with_context_or_define_printer() if not printer -%}
+    {%- set pp   = printer.printer -%}
+    {%- set gbl  = pp.__class__.__init__.__globals__ -%}
+    {%- set np   = gbl.importlib.import_module('numpy') -%}
+    {%- set math = gbl.importlib.import_module('math') -%}
+
+    {%- macro _key(p) -%}{ "%.4f,%.4f" % (p[0], p[1]) }{%- endmacro -%}
+
+    # Populates `out_lut` list with the Marching Squares Lookup Table.
+    {%- macro generate_marching_squares_lut(out_lut) -%}
+        {%- for i in range(16) -%}
+            {%- set midpoints = [] -%}
+            {%- set _ = midpoints.append((0.5, 0.0)) if (i // 8 % 2) != (i // 4 % 2) -%}
+            {%- set _ = midpoints.append((1.0, 0.5)) if (i // 4 % 2) != (i // 2 % 2) -%}
+            {%- set _ = midpoints.append((0.5, 1.0)) if (i // 2 % 2) != (i % 2)      -%}
+            {%- set _ = midpoints.append((0.0, 0.5)) if (i % 2)      != (i // 8 % 2) -%}
+            {%- set segments = [] -%}
+            {%- set _ = segments.append([midpoints[0], midpoints[1]]) if midpoints|length >= 2 -%}
+            {%- set _ = segments.append([midpoints[2], midpoints[3]]) if midpoints|length == 4 -%}
+            {%- set _ = out_lut.append(segments) -%}
+        {%- endfor -%}
+    {%- endmacro -%}
+
+    # Populates `out_data` with the raster grid and its metadata.
+    {%- macro rasterize_lines(out_data, layer_lines, resolution) -%}
+        {%- set flat = layer_lines|sum(start=[]) -%}
+        {%- set x_coords, y_coords = flat|map(attribute='x')|list, flat|map(attribute='y')|list -%}
+        {%- set x_min, x_max = (x_coords|min)-resolution, (x_coords|max)+resolution -%}
+        {%- set y_min, y_max = (y_coords|min)-resolution, (y_coords|max)+resolution -%}
+        {%- set grid_w = ((x_max - x_min) / resolution)|round(0, 'ceil')|int -%}
+        {%- set grid_h = ((y_max - y_min) / resolution)|round(0, 'ceil')|int -%}
+        {%- set grid = np.zeros((grid_h+2, grid_w+2), dtype=np.int8) -%}
+        {%- set pad = 1 -%}
+        {%- for segment in layer_lines -%}
+            {%- for i in range(segment|length - 1) -%}
+                {%- set p1, p2 = segment[i], segment[i+1] -%}
+                {%- set dist = math.hypot(p2.x - p1.x, p2.y - p1.y) -%}
+                {%- set steps = (dist / (resolution*0.5))|round(0, 'ceil')|int + 1 -%}
+                {%- for s in range(steps + 1) -%}
+                    {%- set t = s / steps -%}
+                    {%- set x, y = p1.x+t*(p2.x-p1.x), p1.y+t*(p2.y-p1.y) -%}
+                    {%- set gx, gy = (((x-x_min)/resolution)|int)+pad, (((y-y_min)/resolution)|int)+pad -%}
+                    {%- if 0 <= gx < (grid_w+2) and 0 <= gy < (grid_h+2) -%}
+                        {%- set _ = grid.__setitem__((gy, gx), 1) -%}
+                    {%- endif -%}
+                {%- endfor -%}
+            {%- endfor -%}
+        {%- endfor -%}
+        {%- set _ = out_data.update({'grid':grid, 'w':grid_w, 'h':grid_h, 'x_min':x_min, 'y_min':y_min, 'pad':pad}) -%}
+    {%- endmacro -%}
+
+    # Populates `out_segments` with contour segments from the raster data.
+    {%- macro extract_contour_segments(out_segments, raster_data, resolution, lut) -%}
+        {%- for y in range(raster_data.h + 1) -%}
+            {%- for x in range(raster_data.w + 1) -%}
+                {%- set g = raster_data.grid -%}
+                {%- set case = (g[y,x]*8)+(g[y,x+1]*4)+(g[y+1,x+1]*2)+g[y+1,x] -%}
+                {%- for p1_off, p2_off in lut[case] -%}
+                    {%- set p1x = raster_data.x_min + (x+p1_off[0]-raster_data.pad)*resolution -%}
+                    {%- set p1y = raster_data.y_min + (y+p1_off[1]-raster_data.pad)*resolution -%}
+                    {%- set p2x = raster_data.x_min + (x+p2_off[0]-raster_data.pad)*resolution -%}
+                    {%- set p2y = raster_data.y_min + (y+p2_off[1]-raster_data.pad)*resolution -%}
+                    {%- set k1, k2 = _key([p1x,p1y]), _key([p2x,p2y]) -%}
+                    {%- set _ = out_segments.pop(k2) if k2 in out_segments else out_segments.update({k1:[p2x,p2y]}) -%}
+                {%- endfor -%}
+            {%- endfor -%}
+        {%- endfor -%}
+    {%- endmacro -%}
+
+    # Populates `out_polygons` list by chaining segments from `segments_in`.
+    {%- macro chain_segments(out_polygons, segments_in) -%}
+        {%- set active = segments_in.copy() -%}
+        {%- for start_key in segments_in.keys() if start_key in active -%}
+            {%- set start_point = start_key.split(',')|map('float')|list -%}
+            {%- set poly = [start_point] -%}
+            {%- set current_key = start_key -%}
+            {%- set is_open = namespace(v=False) -%}
+            {%- for _ in range(active|length + 1) if not is_open.v -%}
+                {%- set next_point = active.pop(current_key, None) -%}
+                {%- if next_point is none -%}
+                    {%- set is_open.v = True -%}
+                {%- else -%}
+                    {%- set _ = poly.append(next_point) -%}
+                    {%- if _key(next_point) == start_key -%}
+                        {%- set _ = out_polygons.append(poly) if poly|length > 2 -%}
+                        {%- set is_open.v = True -%}
+                    {%- endif -%}
+                {%- endif -%}
+            {%- endfor -%}
+        {%- endfor -%}
+    {%- endmacro -%}
+
+
+[gcode_macro _GCODE_TOOLS]
+gcode:
+    {% set _ = missing_context_please_import_with_context_or_define_printer() if not printer %}
+    {% set gbl = printer.printer.__class__.__init__.__globals__ %}
+    {% set np  = gbl.importlib.import_module('numpy') -%}
+    {% set io  = gbl.importlib.import_module('io') %}
+    {% set os  = gbl.importlib.import_module('os') %}
+    {% set re  = gbl.importlib.import_module('re') %}
+
+    {% set error = action_raise_error %}
+
+    # ------------------------------------------------------------
+    {%- macro get_file_path(file_path='') -%}
+        {%- set path = printer.virtual_sdcard.get('file_path', '') -%}
+        {%- if not path -%}
+            {%- set base = printer.configfile.settings.virtual_sdcard.get('path', '') -%}
+            {%- set name = printer.print_stats.filename -%}
+            {%- set path = (base ~ '/' ~ name) if (base and name) else '' -%}
+        {%- endif -%}
+        {%- set path = file_path if file_path else path -%}
+        {%- set path = os.path.expanduser(path) if path and not (os.path.exists(path) and os.path.isfile(path)) else path -%}
+        { path }
+    {%- endmacro -%}
+
+    {% set __rw_state = {} %}
+    {%- macro read_gcode_lines(path='',
+                              kbytes=1024,
+                              offset=none,
+                              reset=False) -%}
+        {%- set _bytes = kbytes * 1024 -%}
+
+        {%- macro _init_file(path='', offset=0) -%}
+            {%- set _size = os.path.getsize(path)|int -%}
+            {%- set _ = __rw_state.update({ path: {
+                'size': _size,
+                'current_offset': [[offset|int(0), 0]|max, _size]|min
+            } }) -%}
+        {%- endmacro -%}
+    
+        {%- if path and os.path.exists(path) and os.path.isfile(path) -%}
+            {%- set _ = _init_file(path, offset) 
+                        if path not in __rw_state or offset is not none or reset -%}
+            {%- if not reset -%}
+                {%- set cur_pointer = __rw_state[path].current_offset -%}
+                {%- set size        = __rw_state[path].size -%}
+                {%- if cur_pointer < size -%}
+                    {%- set to_read     = [ _bytes, size - cur_pointer ]|min -%}
+                    {%- set file_handle = io.open(path, 'r', encoding='utf-8', errors='ignore') -%}
+                    {%- set _           = file_handle.seek(cur_pointer) -%}
+                    {%- set data        = file_handle.read(to_read) or '' -%}
+                    {%- set end_marker  = data.rfind('\n') -%}
+                    {%- set new_pointer = size -%}
+                    {%- if end_marker == -1 -%}
+                        {%- set _ = error('read_gcode_lines: window has no newline before EOF, ' ~ 
+                                        '(either the file is broken, or the chunk size too small)') 
+                                        if error is callable and cur_pointer + to_read != size -%}
+                    {%- else -%}
+                        {%- set data        = data[:end_marker] -%}
+                        {%- set new_pointer = cur_pointer + end_marker + 1 -%}
+                    {%- endif -%}
+                    {%- set _ = _init_file(path, new_pointer) -%}
+                    { data or '' }
+                {%- endif -%}
+            {%- endif -%}
+        {%- else -%}
+            {%- set _ = error('read_file: error reading file, (''' ~ path ~ ''') does not exist.') -%}
+        {%- endif -%}
+    {%- endmacro -%}
+
+    # ------------------------------------------------------------
+    {%- macro _parse_line(line, gcode_params) -%}
+        {% set _ = gcode_params.clear() %}
+        {% set clean_line = line.split(';')[0].strip() %}
+        {% for part in clean_line.split() if clean_line %}
+            {% set key, value = part[0]|upper, part[1:]|float(none) %}
+                {% set _ = gcode_params.update({key: value}) if value %}
+                {% set _ = gcode_params.update({key: part[1:]}) if not value and key in ['G', 'M'] %}
+        {% endfor %}
+    {%- endmacro -%}
+
+    {%- macro _update_state(gcode_params, state) -%}
+
+        {%- macro _handle_absolute_relative(gcode_params, state) -%}
+            {% set  g_code = gcode_params.get('G', -1)|int(-1) %}
+            {% set  m_code = gcode_params.get('M', -1)|int(-1) %}
+            {% if   g_code == 91 %}{% set state.relative_pos = True %}
+            {% elif g_code == 90 %}{% set state.relative_pos = False %}{% endif %}
+            {% if   m_code == 83 %}{% set state.relative_ext = True %}
+            {% elif m_code == 82 %}{% set state.relative_ext = False %}{% endif %}
+        {%- endmacro -%}
+
+        {% set state.last_pos = state.pos.copy() %}
+        { _handle_absolute_relative(gcode_params, state) }
+        {% for axis in ['X', 'Y', 'Z', 'E'] if gcode_params.get('G', -1)|int(-1) == 92 
+                                            and axis in gcode_params %}
+            {% set _ = state.pos.update({axis|lower: gcode_params[axis]|round(4)}) %}
+        {% endfor %}
+        {% for axis in ['X', 'Y', 'Z', 'E'] if axis in gcode_params %}
+            {% set rel_marker = state.relative_ext if axis == 'E' else state.relative_pos %}
+            {% set base_pos = state.pos[axis|lower] if rel_marker else 0 %}
+            {% set _ = state.pos.update({axis|lower: (base_pos + gcode_params[axis])|round(4) }) %}
+        {% endfor %}
+    {%- endmacro -%}
+
+    {%- macro parse_layer_gcode(list_out=[],
+                                file_path='',
+                                z_height=0.0,
+                                z_tolerance=0.005,
+                                z_stop_offset=1.0) -%}
+        {%- macro _process_chunk(state, z_min, z_max, z_stop) -%}
+            {% set chunk = read_gcode_lines(path=path, kbytes=64) %}
+            {% if chunk and not state.stop_parsing %}
+                {% set gcode_params = {} %}
+                {% for line in chunk.split('\n') if not state.stop_parsing %}
+                    {% set _ = _parse_line(line, gcode_params) %}
+                    {% if gcode_params %}
+                        {% set _ = _update_state(gcode_params, state) %}
+                        {% set _ = _process_move(gcode_params, state, z_min, z_max) %}
+                        {% set state.stop_parsing = True if state.pos.z > z_stop else state.stop_parsing %}
+                    {% endif %}
+                {% endfor %}
+                { _process_chunk(state, z_min, z_max, z_stop) if not state.stop_parsing else '' }
+            {% endif %}
+        {%- endmacro -%}
+
+        {%- macro _process_move(gcode_params, state, z_min, z_max) -%}
+            {% set is_in_layer = z_min <= state.pos.z <= z_max %}
+            {% set is_extruding = 'E' in gcode_params and state.pos.e > state.last_pos.e %}
+            {% set is_printing_move = is_in_layer and is_extruding %}
+            
+            {% if state.is_printing %}
+                {% if is_printing_move %}
+                    {% set _ = state.current_line.append(state.pos.copy()) %}
+                {% else %}
+                    {% set _ = list_out.append(state.current_line) if state.current_line|length > 1 %}
+                    {% set state.is_printing = False %}{% set state.current_line = none %}
+                {% endif %}
+            {% elif is_printing_move %}
+                {% set state.is_printing = True %}
+                {% set state.current_line = [state.last_pos.copy(), state.pos.copy()] %}
+            {% endif %}
+        {%- endmacro -%}
+
+        {% set state = namespace(
+            pos={'x':0.0, 'y':0.0, 'z':0.0, 'e':0.0},
+            last_pos={'x':0.0, 'y':0.0, 'z':0.0, 'e':0.0},
+            relative_pos=False, relative_ext=False,
+            stop_parsing=False, is_printing=False, current_line=None,
+        ) %}
+        {% set path = get_file_path(file_path=file_path) %}
+        {% if path %}
+            {% set z_min = z_height - z_tolerance %}
+            {% set z_max = z_height + z_tolerance %}
+            {% set z_stop = z_height + z_stop_offset %}
+            {%- set _ = read_gcode_lines(path=path, reset=True) -%}
+            { _process_chunk(state, z_min, z_max, z_stop) }
+            
+            {% set _ = list_out.append(state.current_line) if state.is_printing and state.current_line|length > 1 %}
+        {% endif %}
+    {%- endmacro -%}
+
+    {%- macro find_first_layer_z(file_path='', 
+                                 extrusion_threshold=1.0, 
+                                 max_scan_z=0.50, 
+                                 min_scan_z=0.005) -%}
+        {%- macro _scan_chunk(state, path) -%}
+            {%- set state.is_starting = False -%}
+            {%- set chunk = read_gcode_lines(path=path,
+                                             kbytes=64) -%}
+            {%- if chunk and not state.stop_parsing -%}
+                {%- set gcode_params = {} -%}
+                {%- for line in chunk.split('\n') if not state.stop_parsing -%}
+                    {%- set _ = _parse_line(line,
+                                            gcode_params) -%}
+                    {%- if gcode_params -%}
+                        {%- set _ = _update_state(gcode_params,
+                                                  state) -%}
+                        {%- set d_e = (state.pos.e - state.last_pos.e) if state.pos.e > state.last_pos.e else 0.0 -%}
+                        {%- set z_val = state.pos.z|round(3) -%}
+                        {%- if z_val >= min_scan_z and d_e > 0 -%}
+                            {%- set old_tot = state.z_totals.get(z_val, 0.0) -%}
+                            {%- set new_tot = old_tot + d_e -%}
+                            {%- set _ = state.z_totals.update({ z_val: new_tot }) -%}
+                            
+                            {%- if old_tot < extrusion_threshold and new_tot >= extrusion_threshold -%}
+                                {%- set state.valid_layer_count = state.valid_layer_count + 1 -%}
+                            {%- endif -%}
+
+                            {%- if z_val > max_scan_z or state.valid_layer_count >= 3 -%}
+                                {%- set state.stop_parsing = True -%}
+                            {%- endif -%}
+                        {%- endif -%}
+                    {%- endif -%}
+                {%- endfor -%}
+                { _scan_chunk(state, path) if not state.stop_parsing else '' }
+            {%- endif -%}
+        {%- endmacro -%}
+
+        {%- set state = namespace(
+            pos={'x':0.0, 'y':0.0, 'z':0.0, 'e':0.0},
+            last_pos={'x':0.0, 'y':0.0, 'z':0.0, 'e':0.0},
+            relative_pos=False, relative_ext=False,
+            z_totals={}, 
+            stop_parsing=False,
+            is_starting=True,
+            valid_layer_count=0
+        ) -%}
+
+        {%- set path = get_file_path(file_path=file_path) -%}
+        {%- if path -%}
+            {%- set _ = read_gcode_lines(path=path, reset=True) -%}
+            { _scan_chunk(state, path) }
+            {%- set result = state.z_totals.items()|selectattr(1, 'ge', extrusion_threshold)
+                                                   |map(attribute=0)|map('float')
+                                                   |sort|first -%}
+            { result or '' }
+        {%- endif -%}
+    {%- endmacro -%}

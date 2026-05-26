@@ -1,4 +1,3 @@
-# klipper-backup 💾 
-Klipper backup script for manual or automated GitHub backups 
+# Klipper Config Backup
 
-This backup is provided by [klipper-backup](https://github.com/Staubgeborener/klipper-backup).
+Current printer configuration backup.

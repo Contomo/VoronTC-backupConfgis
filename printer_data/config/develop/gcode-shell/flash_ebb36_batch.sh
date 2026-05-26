@@ -20,6 +20,8 @@ TARGETS=(
 )
 # ==========================================================
 
+
+
 die(){ echo "ERROR: $*" >&2; exit 1; }
 info(){ echo "== $*"; }
 ok(){ echo "✓ $*"; }
@@ -189,7 +191,7 @@ flash_one(){
 
 main(){
   stop_klipper
-  write_config
+  # write_config
   build_fw
 
   local failed=()

@@ -1,0 +1,7 @@
+ive got a question about something accidental i found out, that i cant quite figure out myself...
+The question is pause related, i noticed this when playing with my toolchanger.
+The pause/error rundown is like this:
+[`validate_detected_tool`](<https://github.com/jwellman80/klipper-toolchanger-easy/blob/08dc049600e8dc8b5aa1120a0a5b4468d827c32b/klipper/extras/toolchanger.py#L350>) "errors" and runs [`error_gcode`](<https://github.com/jwellman80/klipper-toolchanger-easy/blob/08dc049600e8dc8b5aa1120a0a5b4468d827c32b/klipper/extras/toolchanger.py#L395>), inside that, i raise a regular command error (action_raise_error), where does this end up? does this end up inside of [`except gcmd.error`](<https://github.com/jwellman80/klipper-toolchanger-easy/blob/08dc049600e8dc8b5aa1120a0a5b4468d827c32b/klipper/extras/toolchanger.py#L369>)?
+looking at the log, `Error evaluating 'gcode_macro _RAISE:gcode': gcode.CommandError` → `Exiting SD card print (position 204741)` it does not get caught, is that right?
+
+

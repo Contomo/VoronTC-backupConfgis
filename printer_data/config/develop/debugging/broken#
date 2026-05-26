@@ -2,7 +2,7 @@
 description: "Collect up to k1→k2→k3 matches in 'collected_data'. Usage: _MEGA_DUMP_COLLECT SEARCH=some ° terms"
 variable_collected_data: ""
 gcode:
-    {% set raw_search = params.SEARCH|default("")|string|lower %}
+    {% set raw_search = params.SEARCH|d("")|string|lower %}
     {% set terms = raw_search.split("°") %}
     {% set ns = namespace(lines=[]) %}
     {% for k1 in printer %}

@@ -1,0 +1,2304 @@
+{
+  "id": "9658126205894eccb02268816b3133b5",
+  "version": "v0.12.0-773-g54487b90-dirty",
+  "branch": "bleeding-edge-v2",
+  "cpu_info": "8 core ?",
+  "platform": {
+    "machine": "aarch64",
+    "os_release": {
+      "PRETTY_NAME": "Armbian 25.8.2 bookworm",
+      "NAME": "Debian GNU/Linux",
+      "VERSION_ID": "12",
+      "VERSION": "12 (bookworm)",
+      "VERSION_CODENAME": "bookworm",
+      "ID": "debian",
+      "HOME_URL": "https://www.armbian.com",
+      "SUPPORT_URL": "https://forum.armbian.com",
+      "BUG_REPORT_URL": "https://www.armbian.com/bugs",
+      "ARMBIAN_PRETTY_NAME": "Armbian 25.8.2 bookworm"
+    },
+    "version": "#1 SMP Fri Sep 19 06:08:28 UTC 2025",
+    "python": "3.11.2 (main, Apr 28 2025, 14:11:48) [GCC 12.2.0]"
+  },
+  "config": {
+    "virtual_sdcard": [
+      "path",
+      "on_error_gcode"
+    ],
+    "pause_resume": [],
+    "display_status": [],
+    "respond": [],
+    "gcode_macro CANCEL_PRINT": [
+      "description",
+      "rename_existing",
+      "gcode"
+    ],
+    "gcode_macro PAUSE": [
+      "description",
+      "rename_existing",
+      "gcode",
+      "variable_pause_settings",
+      "variable_pause_info",
+      "variable_paused_tooltemps"
+    ],
+    "gcode_macro RESUME": [
+      "description",
+      "rename_existing",
+      "variable_last_extruder_temp",
+      "variable_restore_idle_timeout",
+      "variable_idle_state",
+      "gcode",
+      "variable_resume_settings"
+    ],
+    "gcode_macro SET_PAUSE_NEXT_LAYER": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro SET_PAUSE_AT_LAYER": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro SET_PRINT_STATS_INFO": [
+      "rename_existing",
+      "description",
+      "variable_pause_next_layer",
+      "variable_pause_at_layer",
+      "gcode",
+      "variable_pause_at_extrusion_role"
+    ],
+    "gcode_macro _TOOLHEAD_PARK_PAUSE_CANCEL": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro _CLIENT_EXTRUDE": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro _CLIENT_RETRACT": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro _CLIENT_LINEAR_MOVE": [
+      "description",
+      "gcode"
+    ],
+    "mcu": [
+      "serial",
+      "restart_method"
+    ],
+    "mcu et0": [
+      "canbus_uuid",
+      "is_non_critical"
+    ],
+    "temperature_sensor T0_mcu": [
+      "sensor_type",
+      "sensor_mcu"
+    ],
+    "gcode_macro T0": [
+      "variable_active",
+      "variable_color",
+      "variable_tool_number",
+      "gcode"
+    ],
+    "tool T0": [
+      "detection_pin",
+      "tool_number",
+      "extruder",
+      "fan",
+      "params_accelerometer"
+    ],
+    "tool_probe T0": [
+      "pin",
+      "tool",
+      "speed",
+      "lift_speed",
+      "samples",
+      "samples_result",
+      "sample_retract_dist",
+      "samples_tolerance",
+      "samples_tolerance_retries",
+      "activate_gcode",
+      "z_offset"
+    ],
+    "tmc2209 extruder": [
+      "uart_pin",
+      "run_current",
+      "stealthchop_threshold",
+      "sense_resistor"
+    ],
+    "extruder": [
+      "step_pin",
+      "dir_pin",
+      "enable_pin",
+      "microsteps",
+      "full_steps_per_rotation",
+      "rotation_distance",
+      "max_extrude_only_distance",
+      "nozzle_diameter",
+      "filament_diameter",
+      "heater_pin",
+      "sensor_type",
+      "sensor_pin",
+      "control",
+      "min_temp",
+      "max_temp",
+      "max_extrude_cross_section",
+      "pressure_advance",
+      "pressure_advance_smooth_time",
+      "smooth_time",
+      "pid_kp",
+      "pid_ki",
+      "pid_kd"
+    ],
+    "fan_generic T0_partfan": [
+      "pin"
+    ],
+    "heater_fan T0_hotend_fan": [
+      "pin",
+      "heater",
+      "heater_temp"
+    ],
+    "neopixel T0_leds": [
+      "pin",
+      "chain_count",
+      "color_order",
+      "initial_red",
+      "initial_green",
+      "initial_blue",
+      "initial_white"
+    ],
+    "gcode_button runout_T0": [
+      "pin",
+      "press_gcode",
+      "release_gcode"
+    ],
+    "adxl345 T0": [
+      "cs_pin",
+      "spi_software_sclk_pin",
+      "spi_software_mosi_pin",
+      "spi_software_miso_pin",
+      "axes_map"
+    ],
+    "mcu et1": [
+      "canbus_uuid",
+      "is_non_critical"
+    ],
+    "temperature_sensor T1_mcu": [
+      "sensor_type",
+      "sensor_mcu"
+    ],
+    "gcode_macro T1": [
+      "variable_active",
+      "variable_color",
+      "variable_tool_number",
+      "gcode"
+    ],
+    "tool T1": [
+      "detection_pin",
+      "tool_number",
+      "extruder",
+      "fan"
+    ],
+    "tool_probe T1": [
+      "pin",
+      "tool",
+      "speed",
+      "lift_speed",
+      "samples",
+      "samples_result",
+      "sample_retract_dist",
+      "samples_tolerance",
+      "samples_tolerance_retries",
+      "activate_gcode",
+      "z_offset"
+    ],
+    "neopixel T1_leds": [
+      "pin",
+      "chain_count",
+      "color_order",
+      "initial_red",
+      "initial_green",
+      "initial_blue",
+      "initial_white"
+    ],
+    "tmc2209 extruder1": [
+      "uart_pin",
+      "run_current",
+      "sense_resistor",
+      "stealthchop_threshold"
+    ],
+    "extruder1": [
+      "step_pin",
+      "dir_pin",
+      "enable_pin",
+      "microsteps",
+      "full_steps_per_rotation",
+      "rotation_distance",
+      "max_extrude_only_distance",
+      "max_extrude_only_velocity",
+      "max_extrude_only_accel",
+      "nozzle_diameter",
+      "filament_diameter",
+      "heater_pin",
+      "sensor_type",
+      "sensor_pin",
+      "control",
+      "min_temp",
+      "max_temp",
+      "pressure_advance",
+      "pressure_advance_smooth_time",
+      "max_extrude_cross_section",
+      "pid_kp",
+      "pid_ki",
+      "pid_kd",
+      "smooth_time"
+    ],
+    "fan_generic T1_partfan": [
+      "pin"
+    ],
+    "heater_fan T1_hotend_fan": [
+      "pin",
+      "heater",
+      "heater_temp"
+    ],
+    "adxl345 T1": [
+      "cs_pin",
+      "spi_software_sclk_pin",
+      "spi_software_mosi_pin",
+      "spi_software_miso_pin",
+      "axes_map"
+    ],
+    "mcu et2": [
+      "canbus_uuid",
+      "is_non_critical"
+    ],
+    "temperature_sensor T2_mcu": [
+      "sensor_type",
+      "sensor_mcu"
+    ],
+    "gcode_macro T2": [
+      "variable_active",
+      "variable_color",
+      "variable_tool_number",
+      "gcode"
+    ],
+    "tool T2": [
+      "detection_pin",
+      "tool_number",
+      "extruder",
+      "fan"
+    ],
+    "tool_probe T2": [
+      "pin",
+      "tool",
+      "speed",
+      "lift_speed",
+      "samples",
+      "samples_result",
+      "sample_retract_dist",
+      "samples_tolerance",
+      "samples_tolerance_retries",
+      "activate_gcode",
+      "z_offset"
+    ],
+    "extruder2": [
+      "step_pin",
+      "dir_pin",
+      "enable_pin",
+      "microsteps",
+      "full_steps_per_rotation",
+      "rotation_distance",
+      "max_extrude_only_distance",
+      "max_extrude_only_velocity",
+      "max_extrude_only_accel",
+      "nozzle_diameter",
+      "filament_diameter",
+      "heater_pin",
+      "sensor_type",
+      "sensor_pin",
+      "spi_bus",
+      "rtd_nominal_r",
+      "rtd_reference_r",
+      "rtd_num_of_wires",
+      "rtd_use_50hz_filter",
+      "control",
+      "pid_kp",
+      "pid_ki",
+      "pid_kd",
+      "min_temp",
+      "max_temp",
+      "pressure_advance",
+      "pressure_advance_smooth_time",
+      "max_extrude_cross_section",
+      "smooth_time"
+    ],
+    "tmc2209 extruder2": [
+      "uart_pin",
+      "run_current",
+      "sense_resistor",
+      "stealthchop_threshold"
+    ],
+    "fan_generic T2_partfan": [
+      "pin"
+    ],
+    "heater_fan T2_hotend_fan": [
+      "pin",
+      "heater",
+      "heater_temp"
+    ],
+    "adxl345 T2": [
+      "cs_pin",
+      "spi_software_sclk_pin",
+      "spi_software_mosi_pin",
+      "spi_software_miso_pin",
+      "axes_map"
+    ],
+    "neopixel T2_leds": [
+      "pin",
+      "chain_count",
+      "color_order",
+      "initial_red",
+      "initial_green",
+      "initial_blue",
+      "initial_white"
+    ],
+    "mcu et3": [
+      "canbus_uuid",
+      "is_non_critical"
+    ],
+    "temperature_sensor T3_mcu": [
+      "sensor_type",
+      "sensor_mcu"
+    ],
+    "gcode_macro T3": [
+      "variable_active",
+      "variable_color",
+      "variable_tool_number",
+      "gcode"
+    ],
+    "tool T3": [
+      "detection_pin",
+      "tool_number",
+      "extruder",
+      "fan"
+    ],
+    "tool_probe T3": [
+      "pin",
+      "tool",
+      "speed",
+      "lift_speed",
+      "samples",
+      "samples_result",
+      "sample_retract_dist",
+      "samples_tolerance",
+      "samples_tolerance_retries",
+      "activate_gcode",
+      "z_offset"
+    ],
+    "extruder3": [
+      "step_pin",
+      "dir_pin",
+      "enable_pin",
+      "microsteps",
+      "full_steps_per_rotation",
+      "rotation_distance",
+      "max_extrude_only_distance",
+      "max_extrude_only_velocity",
+      "max_extrude_only_accel",
+      "nozzle_diameter",
+      "filament_diameter",
+      "heater_pin",
+      "sensor_type",
+      "sensor_pin",
+      "control",
+      "pid_kp",
+      "pid_ki",
+      "pid_kd",
+      "min_temp",
+      "max_temp",
+      "pressure_advance",
+      "pressure_advance_smooth_time",
+      "max_extrude_cross_section",
+      "smooth_time"
+    ],
+    "tmc2209 extruder3": [
+      "uart_pin",
+      "run_current",
+      "sense_resistor",
+      "stealthchop_threshold"
+    ],
+    "fan_generic T3_partfan": [
+      "pin"
+    ],
+    "heater_fan T3_hotend_fan": [
+      "pin",
+      "heater",
+      "heater_temp"
+    ],
+    "adxl345 T3": [
+      "cs_pin",
+      "spi_software_sclk_pin",
+      "spi_software_mosi_pin",
+      "spi_software_miso_pin",
+      "axes_map"
+    ],
+    "neopixel T3_leds": [
+      "pin",
+      "chain_count",
+      "color_order",
+      "initial_red",
+      "initial_green",
+      "initial_blue",
+      "initial_white"
+    ],
+    "mcu et4": [
+      "canbus_uuid",
+      "is_non_critical"
+    ],
+    "temperature_sensor T4_mcu": [
+      "sensor_type",
+      "sensor_mcu"
+    ],
+    "gcode_macro T4": [
+      "variable_active",
+      "variable_color",
+      "variable_tool_number",
+      "gcode"
+    ],
+    "tool T4": [
+      "detection_pin",
+      "tool_number",
+      "extruder",
+      "fan"
+    ],
+    "tool_probe T4": [
+      "pin",
+      "tool",
+      "z_offset",
+      "speed",
+      "lift_speed",
+      "samples",
+      "samples_result",
+      "sample_retract_dist",
+      "samples_tolerance",
+      "samples_tolerance_retries",
+      "activate_gcode"
+    ],
+    "extruder4": [
+      "step_pin",
+      "dir_pin",
+      "enable_pin",
+      "microsteps",
+      "full_steps_per_rotation",
+      "rotation_distance",
+      "max_extrude_only_distance",
+      "max_extrude_only_velocity",
+      "max_extrude_only_accel",
+      "nozzle_diameter",
+      "filament_diameter",
+      "heater_pin",
+      "sensor_type",
+      "sensor_pin",
+      "spi_bus",
+      "rtd_nominal_r",
+      "rtd_reference_r",
+      "rtd_num_of_wires",
+      "rtd_use_50hz_filter",
+      "control",
+      "pid_kp",
+      "pid_ki",
+      "pid_kd",
+      "min_temp",
+      "max_temp",
+      "pressure_advance",
+      "pressure_advance_smooth_time",
+      "max_extrude_cross_section",
+      "smooth_time",
+      "heater_power",
+      "filament_density",
+      "filament_heat_capacity"
+    ],
+    "tmc2209 extruder4": [
+      "uart_pin",
+      "sense_resistor",
+      "run_current",
+      "stealthchop_threshold"
+    ],
+    "fan_generic T4_partfan": [
+      "pin"
+    ],
+    "heater_fan T4_hotend_fan": [
+      "pin",
+      "heater",
+      "heater_temp"
+    ],
+    "adxl345 T4": [
+      "cs_pin",
+      "spi_software_sclk_pin",
+      "spi_software_mosi_pin",
+      "spi_software_miso_pin",
+      "axes_map"
+    ],
+    "neopixel T4_leds": [
+      "pin",
+      "chain_count",
+      "color_order",
+      "initial_red",
+      "initial_green",
+      "initial_blue",
+      "initial_white"
+    ],
+    "gcode_button runout_T4": [
+      "pin",
+      "press_gcode",
+      "release_gcode"
+    ],
+    "heater_chamber_fan chamber": [
+      "sensor_type",
+      "sensor_pin",
+      "pullup_resistor",
+      "min_temp",
+      "max_temp",
+      "control",
+      "pid_kp",
+      "pid_ki",
+      "pid_kd",
+      "fan_pin",
+      "max_power",
+      "min_power",
+      "cycle_time",
+      "hardware_pwm",
+      "linger_time",
+      "linger_power",
+      "auto_linger"
+    ],
+    "controller_fan electronics_fan_left": [
+      "pin",
+      "fan_speed",
+      "idle_speed",
+      "heater",
+      "stepper",
+      "shutdown_speed"
+    ],
+    "controller_fan electronics_fan_right": [
+      "pin",
+      "fan_speed",
+      "idle_speed",
+      "heater",
+      "stepper",
+      "shutdown_speed"
+    ],
+    "neopixel case": [
+      "pin",
+      "chain_count",
+      "initial_red",
+      "initial_green",
+      "initial_blue",
+      "color_order"
+    ],
+    "led_effect case_heating": [
+      "leds",
+      "autostart",
+      "frame_rate",
+      "layers"
+    ],
+    "led_effect light": [
+      "leds",
+      "autostart",
+      "frame_rate",
+      "layers"
+    ],
+    "led_effect rainbow": [
+      "leds",
+      "autostart",
+      "frame_rate",
+      "layers"
+    ],
+    "led_effect white": [
+      "leds",
+      "autostart",
+      "frame_rate",
+      "layers"
+    ],
+    "led_effect Error": [
+      "leds",
+      "layers",
+      "autostart",
+      "frame_rate",
+      "run_on_error"
+    ],
+    "tmc5160 stepper_x": [
+      "run_current",
+      "stealthchop_threshold",
+      "interpolate",
+      "cs_pin",
+      "spi_bus",
+      "sense_resistor",
+      "diag1_pin",
+      "home_current",
+      "driver_sgt"
+    ],
+    "tmc5160 stepper_y": [
+      "run_current",
+      "stealthchop_threshold",
+      "interpolate",
+      "cs_pin",
+      "spi_bus",
+      "sense_resistor",
+      "diag1_pin",
+      "home_current",
+      "driver_sgt"
+    ],
+    "tmc5160 stepper_z": [
+      "run_current",
+      "cs_pin",
+      "spi_bus",
+      "sense_resistor",
+      "interpolate",
+      "stealthchop_threshold"
+    ],
+    "tmc5160 stepper_z1": [
+      "run_current",
+      "cs_pin",
+      "spi_bus",
+      "sense_resistor",
+      "interpolate",
+      "stealthchop_threshold"
+    ],
+    "tmc5160 stepper_z2": [
+      "run_current",
+      "cs_pin",
+      "spi_bus",
+      "sense_resistor",
+      "interpolate",
+      "stealthchop_threshold"
+    ],
+    "tmc5160 stepper_z3": [
+      "run_current",
+      "cs_pin",
+      "spi_bus",
+      "sense_resistor",
+      "interpolate",
+      "stealthchop_threshold"
+    ],
+    "stepper_x": [
+      "step_pin",
+      "dir_pin",
+      "enable_pin",
+      "rotation_distance",
+      "microsteps",
+      "full_steps_per_rotation",
+      "endstop_pin",
+      "position_endstop",
+      "homing_speed",
+      "homing_retract_dist",
+      "homing_positive_dir",
+      "high_precision_step_compress",
+      "position_min",
+      "position_max"
+    ],
+    "stepper_y": [
+      "step_pin",
+      "dir_pin",
+      "enable_pin",
+      "rotation_distance",
+      "microsteps",
+      "full_steps_per_rotation",
+      "endstop_pin",
+      "position_endstop",
+      "homing_speed",
+      "homing_retract_dist",
+      "homing_positive_dir",
+      "high_precision_step_compress",
+      "position_min",
+      "position_max"
+    ],
+    "stepper_z": [
+      "enable_pin",
+      "step_pin",
+      "dir_pin",
+      "rotation_distance",
+      "gear_ratio",
+      "microsteps",
+      "endstop_pin",
+      "position_max",
+      "position_min",
+      "homing_speed",
+      "second_homing_speed",
+      "homing_retract_dist",
+      "high_precision_step_compress"
+    ],
+    "stepper_z1": [
+      "enable_pin",
+      "step_pin",
+      "dir_pin",
+      "rotation_distance",
+      "gear_ratio",
+      "microsteps",
+      "high_precision_step_compress"
+    ],
+    "stepper_z2": [
+      "enable_pin",
+      "step_pin",
+      "dir_pin",
+      "rotation_distance",
+      "gear_ratio",
+      "microsteps",
+      "high_precision_step_compress"
+    ],
+    "stepper_z3": [
+      "enable_pin",
+      "step_pin",
+      "dir_pin",
+      "rotation_distance",
+      "gear_ratio",
+      "microsteps",
+      "high_precision_step_compress"
+    ],
+    "temperature_sensor mcu_temp": [
+      "sensor_type",
+      "min_temp",
+      "max_temp"
+    ],
+    "temperature_sensor OrangePi": [
+      "sensor_type",
+      "min_temp",
+      "max_temp"
+    ],
+    "heater_bed": [
+      "heater_pin",
+      "sensor_type",
+      "sensor_pin",
+      "max_power",
+      "min_temp",
+      "max_temp",
+      "control",
+      "pid_kp",
+      "pid_ki",
+      "pid_kd"
+    ],
+    "gcode_macro _PA_DATA_STORAGE": [
+      "variable_graph_pla_rgb_raw",
+      "variable_abs_insane_speeds_twoeighty_heat",
+      "variable_graph_pla_rgb_adjusted",
+      "variable_graph_elegoo_pla_sea_green",
+      "variable_zyltech_deep_blue_us_batch_petg",
+      "variable_v2",
+      "variable_x1c",
+      "variable_esun_abs_cf",
+      "variable_sunlu_pla_white",
+      "variable_orange_petg_zyltech",
+      "variable_deep_blue_petg_zyltech",
+      "variable_graph_model_from_docs",
+      "variable_sunlu_asa_natural",
+      "variable_petg_overture_light_gary",
+      "variable_petg_sunlu_red",
+      "gcode"
+    ],
+    "gcode_macro PA_PLANE_PLOT": [
+      "gcode"
+    ],
+    "gcode_macro PA_MULTI_PLANE_PLOT": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro PA_PLANE_SINGLE_PLOT": [
+      "gcode"
+    ],
+    "gcode_macro REACTOR_STATS": [
+      "gcode"
+    ],
+    "gcode_macro RELOAD": [
+      "gcode"
+    ],
+    "gcode_macro SHX": [
+      "gcode"
+    ],
+    "gcode_macro SHXB": [
+      "description",
+      "variable_jobs",
+      "gcode"
+    ],
+    "gcode_macro _REGISTER_MODULES_AT_START": [
+      "variable_val",
+      "gcode"
+    ],
+    "delayed_gcode _REGISTER_MODULES_AT_START": [
+      "initial_duration",
+      "gcode"
+    ],
+    "gcode_macro TEST_XY": [
+      "gcode"
+    ],
+    "gcode_macro REDPILL": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro INSPECT_OBJECT": [
+      "description",
+      "variable_color_attr",
+      "variable_color_method",
+      "variable_color_private_method",
+      "variable_color_getter",
+      "variable_color_command",
+      "variable_color_val",
+      "variable_color_type",
+      "variable_color_doc",
+      "variable_color_klipper_obj",
+      "variable_color_container",
+      "variable_color_arg_self",
+      "variable_color_arg_other",
+      "variable_val_cutoff",
+      "variable_font_size",
+      "gcode"
+    ],
+    "gcode_macro _check_kinematic_limits": [
+      "gcode"
+    ],
+    "gcode_macro _PATH_SUBDIVISION": [
+      "description",
+      "variable_input",
+      "variable_output",
+      "variable_default_subdiv",
+      "gcode"
+    ],
+    "gcode_macro INTERACTIVE_CONSOLE_TEST": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro TEST_SCRIPT_INJECTION": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro IMG": [
+      "gcode"
+    ],
+    "gcode_macro BUT": [
+      "gcode"
+    ],
+    "gcode_macro SHOW_COLOR_SWATCHES": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro SHOW_HUE_GRID": [
+      "gcode"
+    ],
+    "gcode_macro TC_DEBUG_VIZ": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro update_git": [
+      "gcode"
+    ],
+    "gcode_shell_command update_git_script": [
+      "command",
+      "timeout",
+      "verbose"
+    ],
+    "gcode_macro PA_TEST": [
+      "variable_settings",
+      "variable_gcode_buffer",
+      "gcode"
+    ],
+    "gcode_macro DROPOFF_TEST": [
+      "description",
+      "gcode"
+    ],
+    "input_shaper": [
+      "shaper_type_x",
+      "shaper_type_y",
+      "shaper_freq_x",
+      "shaper_freq_y",
+      "damping_ratio_x",
+      "damping_ratio_y"
+    ],
+    "gcode_macro SHAPER_ALL": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro SHAPER_X": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro SHAPER_Y": [
+      "description",
+      "gcode"
+    ],
+    "gcode_shell_command adxl_x": [
+      "command",
+      "timeout",
+      "verbose"
+    ],
+    "gcode_shell_command adxl_y": [
+      "command",
+      "timeout",
+      "verbose"
+    ],
+    "shaketune": [
+      "result_folder",
+      "number_of_results_to_keep",
+      "keep_raw_data",
+      "show_macros_in_webui",
+      "dpi"
+    ],
+    "gcode_macro LOAD_FILAMENT": [
+      "description",
+      "variable_selected_temp",
+      "gcode"
+    ],
+    "gcode_macro Test5": [
+      "gcode"
+    ],
+    "gcode_macro _PURGE": [
+      "variable_purge_feed",
+      "variable_bucket_x",
+      "variable_bucket_y",
+      "variable_bucket_z",
+      "variable_bucket_z_safe",
+      "variable_bucket_squeegy_breaker_z_absolute",
+      "variable_bucket_squeegy_breaker_move_y_relative",
+      "variable_bucket_squeegy_breakoff_feedrate",
+      "variable_purge_temp",
+      "variable_purge_length",
+      "variable_purge_length_while_printing",
+      "gcode"
+    ],
+    "gcode_macro MOVE_OVER_BUCKET": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro PURGE_TOOL": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro _PURGE_TOOL": [
+      "gcode"
+    ],
+    "heater_power_distributor toolheads": [
+      "heaters",
+      "max_power",
+      "poll_interval",
+      "model",
+      "active_extruder_boost"
+    ],
+    "gcode_macro ALL_TOOLHEADS_TEMP": [
+      "gcode"
+    ],
+    "gcode_macro TEST_AXIS": [
+      "gcode"
+    ],
+    "sensorless_auto_tune": [],
+    "gcode_macro TC_DOCK_AUTOTUNE": [
+      "description",
+      "variable_range_mm",
+      "variable_step_mm",
+      "variable_pitch_tol",
+      "variable_roll_tol",
+      "variable_threshold",
+      "variable_changes_per",
+      "variable_abort_on_g",
+      "variable_debug",
+      "variable_name",
+      "variable_storage",
+      "gcode"
+    ],
+    "delayed_gcode _TCDOCK_LOOP": [
+      "gcode"
+    ],
+    "gcode_macro _TCDOCK_LOOP": [
+      "gcode"
+    ],
+    "gcode_macro _TC_DOCK_AUTOTUNE_REDO_BASELINE_BUTTON": [
+      "gcode"
+    ],
+    "tool_drop_detection": [
+      "polling_freq",
+      "polling_rate",
+      "peak_g_threshold",
+      "accelerometer",
+      "rotation_threshold",
+      "default_t0",
+      "crash_gcode"
+    ],
+    "gcode_macro TDD_SET_SHUTTLE_DEFAULTS": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro PLOT_PATH": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro TEST_ENDSTOP_REPEATABILITY": [
+      "variable_cache",
+      "gcode"
+    ],
+    "gcode_macro _TEST_ENDSTOP_REPEATABILITY": [
+      "gcode"
+    ],
+    "gcode_macro DOC_DUMP": [
+      "variable_splitter_key",
+      "description",
+      "variable_color_obj",
+      "variable_color_meth",
+      "variable_color_doc",
+      "variable_color_match",
+      "gcode"
+    ],
+    "gcode_macro _DEBUG_OUTPUT_OLD": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro DEBUG_OUTPUT": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro TEST_TC_UPDATE_OFFSETS_FROM_SVF": [
+      "description",
+      "variable_default_round",
+      "variable_default_ampl",
+      "variable_default_noise",
+      "variable_default_probe_noise",
+      "variable_default_probe_bias",
+      "gcode"
+    ],
+    "gcode_macro SEARCH": [
+      "description",
+      "variable_color_box_border",
+      "variable_color_path",
+      "variable_color_key",
+      "variable_color_category",
+      "variable_color_val",
+      "variable_color_typ",
+      "variable_color_match",
+      "variable_font_size",
+      "variable_max_depth",
+      "variable_search_sep",
+      "variable_long_limit",
+      "variable_timeout",
+      "gcode"
+    ],
+    "gcode_macro PRINT_PRINTER_PATH": [
+      "description",
+      "variable_cutoff",
+      "variable_key_cutoff",
+      "variable_color_key",
+      "variable_color_value",
+      "variable_color_container",
+      "variable_color_special",
+      "variable_color_text",
+      "variable_color_error",
+      "variable_color_hint",
+      "variable_color_type",
+      "variable_color_index",
+      "variable_color_bool",
+      "variable_color_bool_false",
+      "variable_color_none",
+      "variable_color_number",
+      "variable_color_string",
+      "variable_color_object",
+      "gcode"
+    ],
+    "delayed_gcode _REGISTER_IMPORTS_AT_START": [
+      "initial_duration",
+      "gcode"
+    ],
+    "gcode_macro DEBUG_GLOBALS": [
+      "gcode"
+    ],
+    "gcode_macro _bedmesh_helper_macros": [
+      "gcode"
+    ],
+    "gcode_macro TEST_BEDHELPER_DIRECT": [
+      "gcode"
+    ],
+    "gcode_macro _global_macros": [
+      "gcode"
+    ],
+    "gcode_macro _homing_helper_macros": [
+      "gcode"
+    ],
+    "gcode_macro _html_helper_macros": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro TEST_MY_HTML": [
+      "gcode"
+    ],
+    "gcode_macro _math_helper_macros": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro _save_config_helper_macros": [
+      "gcode"
+    ],
+    "gcode_macro _toolchanger_helper_macros": [
+      "gcode"
+    ],
+    "gcode_macro _variable_helper_macros": [
+      "gcode"
+    ],
+    "gcode_macro DOCK_TUNER": [
+      "description",
+      "variable_path_interpolation",
+      "variable_state",
+      "gcode"
+    ],
+    "gcode_macro RESPOND": [
+      "rename_existing",
+      "gcode"
+    ],
+    "toolchanger": [
+      "params_failure_speed_divider",
+      "params_failure_acceleration",
+      "recover_gcode",
+      "error_gcode",
+      "perform_restore_move",
+      "params_park_x",
+      "params_park_y",
+      "params_park_z",
+      "on_tool_mounted_gcode",
+      "on_tool_removed_gcode",
+      "after_change_gcode",
+      "dropoff_gcode",
+      "pickup_gcode",
+      "verify_tool_pickup",
+      "on_axis_not_homed",
+      "initialize_on",
+      "uses_axis",
+      "t_command_restore_axis",
+      "params_safe_y",
+      "params_close_y",
+      "params_tool_size",
+      "params_fast_speed",
+      "params_path_speed",
+      "params_dropoff_path",
+      "params_pickup_path"
+    ],
+    "gcode_macro _RAISE": [
+      "gcode"
+    ],
+    "gcode_macro _TOOLCHANGE_ERROR_HANDLER": [
+      "description",
+      "variable_state",
+      "variable_tool_temps",
+      "gcode"
+    ],
+    "delayed_gcode _verify_pickup_error_handler": [
+      "gcode"
+    ],
+    "gcode_macro RAISE_Z_A_BIT": [
+      "description",
+      "variable_macro_html",
+      "gcode"
+    ],
+    "delayed_gcode _INIT_AT_STARTUP": [
+      "initial_duration",
+      "gcode"
+    ],
+    "delayed_gcode _MIGRATION_CONFIG_CHECK_AND_STARTUP_VALUE_LOADING": [
+      "initial_duration",
+      "gcode"
+    ],
+    "gcode_macro _MIGRATION_CONFIG_CHECK_AND_STARTUP_VALUE_LOADING": [
+      "gcode"
+    ],
+    "gcode_macro M104": [
+      "rename_existing",
+      "description",
+      "gcode"
+    ],
+    "gcode_macro M109": [
+      "rename_existing",
+      "description",
+      "variable_default_deadband",
+      "gcode"
+    ],
+    "gcode_macro SAVE_TOOLTEMP_STATE": [
+      "description",
+      "variable_slots",
+      "gcode"
+    ],
+    "gcode_macro RESTORE_TOOLTEMP_STATE": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro _TAP_PROBE_ACTIVATE": [
+      "description",
+      "variable_max_temp",
+      "gcode"
+    ],
+    "gcode_macro SHOW_LAST_CALIBRATION_RESULTS": [
+      "variable_rounding",
+      "variable_settings",
+      "gcode"
+    ],
+    "gcode_macro _TC_LOG_OFFSET_HISTORY": [
+      "description",
+      "variable_macro_html",
+      "variable_default_max_entries",
+      "variable_default_rounding",
+      "variable_save_sep_or_pile",
+      "gcode"
+    ],
+    "gcode_macro TC_OFFSET_STATS": [
+      "description",
+      "variable_macro_html",
+      "gcode"
+    ],
+    "gcode_macro _TC_ADJUST_TTBZ_DRIFT": [
+      "description",
+      "variable_macro_html",
+      "variable_key_name",
+      "gcode"
+    ],
+    "gcode_macro MOVE_OVER_PROBE": [
+      "description",
+      "variable_macro_html",
+      "variable_move_back_before_appraoch_y",
+      "gcode"
+    ],
+    "gcode_macro TC_FIND_TOOL_OFFSETS": [
+      "description",
+      "variable_macro_html",
+      "variable_saved_tool_temps",
+      "gcode"
+    ],
+    "gcode_macro _TC_UPDATE_OFFSETS": [
+      "description",
+      "variable_rounding",
+      "variable_svf_prefix",
+      "variable_svf_probe_key",
+      "variable_state",
+      "gcode"
+    ],
+    "gcode_macro TC_PROBE_CALIBRATION_PROBE": [
+      "variable_probe_extra_params",
+      "variable_enable_probe_calibration",
+      "gcode"
+    ],
+    "gcode_macro TC_FIND_PROBE_TRIGGER_TO_BOTTOM": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro _TC_FIND_PROBE_TRIGGER_TO_BOTTOM": [
+      "gcode"
+    ],
+    "gcode_macro TC_FIND_FIRST_CALIBRATION_PROBE_POSITION": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro _TC_FIND_FIRST_CALIBRATION_PROBE_POSITION": [
+      "variable_macro_html",
+      "gcode"
+    ],
+    "gcode_macro DEBUG_LED": [
+      "description",
+      "gcode"
+    ],
+    "display_template _global_brightness_scalar": [
+      "param_rgbw_list",
+      "text"
+    ],
+    "display_template logo": [
+      "param_tn",
+      "param_brightness",
+      "param_idx",
+      "param_max_idx",
+      "text"
+    ],
+    "display_template nozzle": [
+      "param_tn",
+      "param_idx",
+      "param_brightness",
+      "param_min_temp",
+      "param_max_temp",
+      "text"
+    ],
+    "delayed_gcode _LOAD_CLEAN_NOZZLE_LOCATION": [
+      "initial_duration",
+      "gcode"
+    ],
+    "gcode_macro _T0_vars": [
+      "variable_logo_led_name",
+      "variable_logo_idx",
+      "variable_logo_brightness",
+      "variable_nozzle_led_name",
+      "variable_nozzle_idx",
+      "variable_nozzle_brightness",
+      "gcode"
+    ],
+    "gcode_macro _T1_vars": [
+      "variable_logo_led_name",
+      "variable_logo_idx",
+      "variable_logo_brightness",
+      "variable_nozzle_led_name",
+      "variable_nozzle_idx",
+      "variable_nozzle_brightness",
+      "gcode"
+    ],
+    "gcode_macro _T2_vars": [
+      "variable_logo_led_name",
+      "variable_logo_idx",
+      "variable_logo_brightness",
+      "variable_nozzle_led_name",
+      "variable_nozzle_idx",
+      "variable_nozzle_brightness",
+      "gcode"
+    ],
+    "gcode_macro _T3_vars": [
+      "variable_logo_led_name",
+      "variable_logo_idx",
+      "variable_logo_brightness",
+      "variable_nozzle_led_name",
+      "variable_nozzle_idx",
+      "variable_nozzle_brightness",
+      "gcode"
+    ],
+    "gcode_macro _T4_vars": [
+      "variable_logo_led_name",
+      "variable_logo_idx",
+      "variable_logo_brightness",
+      "variable_nozzle_led_name",
+      "variable_nozzle_idx",
+      "variable_nozzle_brightness",
+      "gcode"
+    ],
+    "gcode_macro _toolchanger_led_vars": [
+      "variable_global_brightness",
+      "variable_invert",
+      "variable_force_updates",
+      "variable_debug",
+      "variable_colors",
+      "variable_status",
+      "variable_cache",
+      "gcode"
+    ],
+    "delayed_gcode _SCALE_IDLE_BRIGHTNESS": [
+      "initial_duration",
+      "gcode"
+    ],
+    "display_template fast-equals-bright": [
+      "text"
+    ],
+    "display_template gradient-rgb": [
+      "param_from",
+      "param_to",
+      "param_speed",
+      "param_wave",
+      "param_idx",
+      "param_max_idx",
+      "text"
+    ],
+    "display_template rainbow": [
+      "param_idx",
+      "param_max_idx",
+      "text"
+    ],
+    "display_template different-color-per-tool": [
+      "param_tn",
+      "text"
+    ],
+    "delayed_gcode _INITIALIZE_TOOL_LED_TEMPLATES": [
+      "initial_duration",
+      "gcode"
+    ],
+    "gcode_macro STATUS_OFF": [
+      "gcode"
+    ],
+    "gcode_macro STATUS_MESHING": [
+      "gcode"
+    ],
+    "gcode_macro STATUS_ON": [
+      "gcode"
+    ],
+    "gcode_macro _OVERWRITE_STATUS": [
+      "gcode"
+    ],
+    "gcode_macro STATUS_HEATING": [
+      "gcode"
+    ],
+    "gcode_macro STATUS_READY": [
+      "gcode"
+    ],
+    "gcode_macro STATUS_RESET": [
+      "gcode"
+    ],
+    "gcode_macro STATUS_IDLE": [
+      "gcode"
+    ],
+    "gcode_macro LOAD_TOOL_LED_TEMPLATE": [
+      "variable_led_type",
+      "description",
+      "gcode"
+    ],
+    "gcode_macro _UPDATE_TOOL_UI": [
+      "description",
+      "gcode"
+    ],
+    "Input_shaper": [],
+    "gcode_macro SHAPER_CALIBRATE": [
+      "rename_existing",
+      "gcode"
+    ],
+    "gcode_macro TC_LOAD_SHAPERS": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro TC_SHAPER_CALIBRATE": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro _TC_SHAPER_CALIBRATE_SAVE_TO_SVF": [
+      "description",
+      "variable_default_type",
+      "variable_default_freq",
+      "variable_default_damp",
+      "gcode"
+    ],
+    "gcode_macro _TC_SHAPER_CALIBRATE_SAVE_PARAMS": [
+      "description",
+      "variable_default_type",
+      "variable_default_freq",
+      "variable_default_damp",
+      "gcode"
+    ],
+    "delayed_gcode _FILAMENT_RUNOUT_STARTUP_UNLOCK": [
+      "initial_duration",
+      "gcode"
+    ],
+    "gcode_macro FILAMENT_RUNOUT": [
+      "variable_runout_settings",
+      "variable_active_config",
+      "variable_startup_lock",
+      "gcode"
+    ],
+    "delayed_gcode _RUNOUT_WATCHDOG_LOOP": [
+      "gcode"
+    ],
+    "gcode_macro _RUNOUT_WATCHDOG": [
+      "variable_runout_event",
+      "variable_abort_on_paused",
+      "variable_loop_delay",
+      "gcode"
+    ],
+    "gcode_macro _FILAMENT_RUNOUT_MANAGER": [
+      "variable_ui_settings",
+      "variable_last_button",
+      "variable_initialized",
+      "gcode"
+    ],
+    "gcode_macro _FILAMENT_INSERT_MANAGER": [
+      "variable_state",
+      "gcode"
+    ],
+    "delayed_gcode _HEAT_SOAK_UPDATE": [
+      "gcode"
+    ],
+    "gcode_macro PRINT_START": [
+      "variable_soak_settings",
+      "variable_state",
+      "gcode"
+    ],
+    "gcode_macro PART_AREA": [
+      "variable_colors",
+      "gcode"
+    ],
+    "delayed_gcode _LAZY_PAUSE_CHECK": [
+      "gcode"
+    ],
+    "gcode_macro LAZY_PAUSE": [
+      "description",
+      "variable_pause_settings",
+      "variable_state",
+      "gcode"
+    ],
+    "delayed_gcode _ENSURE_TOOLHEAD_BEFORE_TIMEOUT": [
+      "gcode"
+    ],
+    "gcode_macro PRIME_LINES": [
+      "description",
+      "variable_lines_per_tool",
+      "variable_line_step_y",
+      "variable_spacing",
+      "variable_ratio",
+      "variable_x_neg_offset",
+      "variable_x_length",
+      "variable_y_offset",
+      "variable_pre_prime",
+      "variable_wipe_length",
+      "variable_initial_tool_retract",
+      "variable_docked_tool_retract",
+      "variable_z_prime_pos",
+      "variable_z_move_pos",
+      "variable_prime_speed",
+      "variable_wipe_speed",
+      "variable_temp_drop",
+      "gcode"
+    ],
+    "gcode_macro HEATSOAK": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro _PRINT_START": [
+      "gcode"
+    ],
+    "gcode_macro PRINT_END": [
+      "gcode"
+    ],
+    "gcode_macro _MOVE_BACK_END_PAUSE_CANCEL": [
+      "variable_lift_z",
+      "variable_y_move_zmax",
+      "variable_y_move_zmin",
+      "variable_speed",
+      "gcode"
+    ],
+    "gcode_macro HEAT_TOOLS": [
+      "description",
+      "variable_tol",
+      "variable_default_max_heating",
+      "gcode"
+    ],
+    "gcode_macro SET_PAUSE_AT_EXTRUSION_ROLE": [
+      "description",
+      "variable_current_extrusion_role",
+      "gcode"
+    ],
+    "gcode_macro CLEAN_NOZZLE": [
+      "description",
+      "variable_brush_center_x",
+      "variable_brush_center_y",
+      "variable_brush_height_z",
+      "variable_brush_plunge",
+      "variable_safe_above",
+      "variable_wipe_x_length",
+      "variable_wipe_y_length",
+      "variable_wipe_times",
+      "variable_path_segments",
+      "variable_wipe_speed",
+      "variable_shape",
+      "gcode"
+    ],
+    "force_move": [
+      "enable_force_move"
+    ],
+    "gcode_macro _MOVE_AWAY_FROM_AXIS_EXTREME": [
+      "gcode"
+    ],
+    "homing_override": [
+      "axes",
+      "gcode"
+    ],
+    "gcode_macro G32": [
+      "gcode"
+    ],
+    "gcode_macro QUAD_GANTRY_LEVEL": [
+      "rename_existing",
+      "description",
+      "variable_fine_move",
+      "gcode"
+    ],
+    "gcode_macro PAIN_GANTRY_LEVEL": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro BED_MESH_CALIBRATE": [
+      "rename_existing",
+      "gcode"
+    ],
+    "gcode_macro _SET_GCODE_OFFSET_UI": [
+      "variable_settings",
+      "gcode"
+    ],
+    "gcode_macro SET_GCODE_OFFSET": [
+      "rename_existing",
+      "description",
+      "variable_sequence",
+      "variable_mode",
+      "variable_state",
+      "gcode"
+    ],
+    "gcode_macro TC_LOAD_OFFSETS": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro _TC_ADJUST_HOME_OFFSET": [
+      "description",
+      "variable_macro_html",
+      "variable_height_to_adjust_at",
+      "gcode"
+    ],
+    "gcode_macro TOOLCHANGE_DEMO": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro MOVE_TO_CENTER": [
+      "gcode"
+    ],
+    "gcode_macro CLEAR_PAUSE": [
+      "rename_existing",
+      "gcode"
+    ],
+    "gcode_macro PRINT_STATUS": [
+      "gcode"
+    ],
+    "gcode_macro UNSAFE_LOWER_BED": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro UNSAFE_RAISE_BED": [
+      "gcode"
+    ],
+    "gcode_macro UNLOAD_FILAMENT": [
+      "gcode"
+    ],
+    "gcode_macro UNLOAD_ONE_FILAMENT": [
+      "gcode"
+    ],
+    "gcode_macro UNLOAD_ALL_FILAMENT": [
+      "gcode"
+    ],
+    "gcode_macro CHANGE_NOZZLE": [
+      "gcode"
+    ],
+    "gcode_macro UI_CENTRAL": [
+      "description",
+      "variable_ui_settings",
+      "gcode"
+    ],
+    "gcode_macro ADJUST_TOOL_OFFSETS_UI": [
+      "variable_ui_settings",
+      "variable_state",
+      "variable_saves",
+      "gcode"
+    ],
+    "gcode_macro TC_CALIRATE_UI": [
+      "gcode"
+    ],
+    "gcode_macro TOOL_REMAP_UI": [
+      "gcode"
+    ],
+    "gcode_macro SELECT_TOOL": [
+      "rename_existing",
+      "gcode"
+    ],
+    "gcode_macro _auto_continue": [
+      "gcode"
+    ],
+    "delayed_gcode _auto_continue_loop": [
+      "gcode"
+    ],
+    "gcode_macro _auto_continue_retry": [
+      "gcode"
+    ],
+    "gcode_macro SAVE_DOCK_HERE": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro _TX_INFO": [
+      "description",
+      "variable_macro_html",
+      "gcode"
+    ],
+    "gcode_macro _UNIFIED_RESPOND": [
+      "description",
+      "variable_message_colors",
+      "variable_macro_colors",
+      "variable_c_start",
+      "variable_c_close",
+      "variable_b_start",
+      "variable_b_close",
+      "variable_cmd_start",
+      "variable_cmd_close",
+      "gcode"
+    ],
+    "danger_options": [
+      "log_statistics",
+      "log_bed_mesh_at_startup",
+      "log_velocity_limit_changes",
+      "log_pressure_advance_changes",
+      "bgflush_extra_time",
+      "endstop_sample_count"
+    ],
+    "constants": [
+      "toolheads_hotplug",
+      "stepcompress_xyz",
+      "home_current_xy",
+      "home_retract_xy"
+    ],
+    "pa_test": [
+      "size_x",
+      "size_y",
+      "height",
+      "origin_x",
+      "origin_y",
+      "layer_height",
+      "first_layer_height",
+      "perimeters",
+      "brim_width",
+      "slow_velocity",
+      "medium_velocity",
+      "fast_velocity",
+      "filament_diameter"
+    ],
+    "delayed_gcode start_pa_test": [
+      "gcode"
+    ],
+    "delayed_gcode end_pa_test": [
+      "gcode"
+    ],
+    "gcode_macro RUN_PA_TEST": [
+      "variable_bed_temp",
+      "variable_hotend_temp",
+      "variable_pa_value",
+      "variable_pa_range",
+      "variable_flow_rate",
+      "variable_testparam",
+      "variable_rawparams",
+      "gcode"
+    ],
+    "exclude_object": [],
+    "gcode_arcs": [
+      "resolution"
+    ],
+    "printer": [
+      "kinematics",
+      "max_velocity",
+      "max_z_velocity",
+      "max_accel",
+      "max_z_accel",
+      "square_corner_velocity"
+    ],
+    "idle_timeout": [
+      "timeout"
+    ],
+    "save_variables": [
+      "filename"
+    ],
+    "resonance_tester": [
+      "max_smoothing",
+      "accel_chip",
+      "probe_points"
+    ],
+    "quad_gantry_level": [
+      "speed",
+      "horizontal_move_z",
+      "retries",
+      "retry_tolerance",
+      "max_adjust",
+      "gantry_corners",
+      "points"
+    ],
+    "bed_mesh": [
+      "speed",
+      "horizontal_move_z",
+      "mesh_min",
+      "mesh_max",
+      "probe_count",
+      "fade_start",
+      "fade_end",
+      "adaptive_margin"
+    ],
+    "rounded_path": [
+      "resolution",
+      "algorithm",
+      "replace_g0"
+    ],
+    "gcode_macro _toolchanger_settings": [
+      "variable_color_scheme",
+      "variable_homing",
+      "variable_macro_accel_divider",
+      "variable_use_tap_requires_temperature",
+      "variable_svf",
+      "variable_clean_nozzle_macro",
+      "variable_print_start",
+      "variable_tc_failure",
+      "variable_offset_history",
+      "variable_offset_calibration",
+      "gcode"
+    ],
+    "tools_calibrate": [
+      "pin",
+      "spread",
+      "lower_z",
+      "travel_speed",
+      "speed",
+      "lift_speed",
+      "final_lift_z",
+      "sample_retract_dist",
+      "samples_tolerance",
+      "samples_tolerance_retries",
+      "samples",
+      "samples_result"
+    ],
+    "tool_probe_endstop": [
+      "crash_mintime",
+      "crash_gcode"
+    ],
+    "gcode_macro TOOL_PROBE_CRASH_RESUME": [
+      "gcode"
+    ],
+    "gcode_macro T99": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro T98": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro SVF_BACKUP": [
+      "variable_path",
+      "variable_min_hours_for_backup",
+      "gcode"
+    ],
+    "delayed_gcode _SVF_BACKUP": [
+      "initial_duration",
+      "gcode"
+    ],
+    "board_pins": [
+      "aliases"
+    ],
+    "bed_mesh default": [
+      "version",
+      "points",
+      "x_count",
+      "y_count",
+      "mesh_x_pps",
+      "mesh_y_pps",
+      "algo",
+      "tension",
+      "min_x",
+      "max_x",
+      "min_y",
+      "max_y"
+    ],
+    "bed_mesh wave": [
+      "version",
+      "points",
+      "x_count",
+      "y_count",
+      "min_x",
+      "max_x",
+      "min_y",
+      "max_y",
+      "mesh_x_pps",
+      "mesh_y_pps",
+      "algo",
+      "tension"
+    ],
+    "bed_mesh sincfunc": [
+      "version",
+      "points",
+      "x_count",
+      "y_count",
+      "min_x",
+      "max_x",
+      "min_y",
+      "max_y",
+      "mesh_x_pps",
+      "mesh_y_pps",
+      "algo",
+      "tension"
+    ],
+    "bed_mesh sine": [
+      "version",
+      "points",
+      "min_x",
+      "max_x",
+      "min_y",
+      "max_y",
+      "x_count",
+      "y_count",
+      "mesh_x_pps",
+      "mesh_y_pps",
+      "algo",
+      "tension"
+    ],
+    "bed_mesh monky": [
+      "version",
+      "points",
+      "min_x",
+      "max_x",
+      "min_y",
+      "max_y",
+      "x_count",
+      "y_count",
+      "mesh_x_pps",
+      "mesh_y_pps",
+      "algo",
+      "tension"
+    ],
+    "gcode_macro excitate_axis_at_freq": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro axes_map_calibration": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro compare_belts_responses": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro axes_shaper_calibration": [
+      "description",
+      "gcode"
+    ],
+    "gcode_macro create_vibrations_profile": [
+      "description",
+      "gcode"
+    ]
+  },
+  "objects": [
+    "gcode",
+    "gcode_io",
+    "webhooks",
+    "configfile",
+    "danger_options",
+    "pins",
+    "mcu",
+    "canbus_ids",
+    "canbus_stats et0",
+    "mcu et0",
+    "canbus_stats et1",
+    "mcu et1",
+    "canbus_stats et2",
+    "mcu et2",
+    "canbus_stats et3",
+    "mcu et3",
+    "canbus_stats et4",
+    "mcu et4",
+    "gcode_move",
+    "print_stats",
+    "gcode_macro",
+    "virtual_sdcard",
+    "pause_resume",
+    "display_status",
+    "respond",
+    "gcode_macro CANCEL_PRINT",
+    "gcode_macro PAUSE",
+    "gcode_macro RESUME",
+    "gcode_macro SET_PAUSE_NEXT_LAYER",
+    "gcode_macro SET_PAUSE_AT_LAYER",
+    "gcode_macro SET_PRINT_STATS_INFO",
+    "gcode_macro _TOOLHEAD_PARK_PAUSE_CANCEL",
+    "gcode_macro _CLIENT_EXTRUDE",
+    "gcode_macro _CLIENT_RETRACT",
+    "gcode_macro _CLIENT_LINEAR_MOVE",
+    "heaters",
+    "adc_temperature",
+    "bme280",
+    "ds18b20",
+    "htu21d",
+    "sht3x",
+    "aht10",
+    "lm75",
+    "spi_temperature",
+    "temperature_host",
+    "temperature_mcu",
+    "temperature_combined",
+    "thermistor ATC Semitec 104GT-2",
+    "thermistor ATC Semitec 104NT-4-R025H42G",
+    "thermistor EPCOS 100K B57560G104F",
+    "thermistor Generic 3950",
+    "thermistor SliceEngineering 450",
+    "thermistor TDK NTCG104LH104JT1",
+    "thermistor Honeywell 100K 135-104LAG-J01",
+    "thermistor NTC 100K MGB18-104F39050L32",
+    "query_adc",
+    "temperature_sensor T0_mcu",
+    "gcode_macro T0",
+    "toolchanger",
+    "buttons",
+    "tool T0",
+    "probe",
+    "tool_probe_endstop",
+    "tool_probe T0",
+    "tmc_uart",
+    "stepper_enable",
+    "tmc2209 extruder",
+    "fan_generic T0_partfan",
+    "heater_fan T0_hotend_fan",
+    "display_template",
+    "led",
+    "neopixel T0_leds",
+    "gcode_button runout_T0",
+    "adxl345 T0",
+    "temperature_sensor T1_mcu",
+    "gcode_macro T1",
+    "tool T1",
+    "tool_probe T1",
+    "neopixel T1_leds",
+    "tmc2209 extruder1",
+    "fan_generic T1_partfan",
+    "heater_fan T1_hotend_fan",
+    "adxl345 T1",
+    "temperature_sensor T2_mcu",
+    "gcode_macro T2",
+    "tool T2",
+    "tool_probe T2",
+    "tmc2209 extruder2",
+    "fan_generic T2_partfan",
+    "heater_fan T2_hotend_fan",
+    "adxl345 T2",
+    "neopixel T2_leds",
+    "temperature_sensor T3_mcu",
+    "gcode_macro T3",
+    "tool T3",
+    "tool_probe T3",
+    "tmc2209 extruder3",
+    "fan_generic T3_partfan",
+    "heater_fan T3_hotend_fan",
+    "adxl345 T3",
+    "neopixel T3_leds",
+    "temperature_sensor T4_mcu",
+    "gcode_macro T4",
+    "tool T4",
+    "tool_probe T4",
+    "tmc2209 extruder4",
+    "fan_generic T4_partfan",
+    "heater_fan T4_hotend_fan",
+    "adxl345 T4",
+    "neopixel T4_leds",
+    "gcode_button runout_T4",
+    "heater_chamber_fan chamber",
+    "controller_fan electronics_fan_left",
+    "controller_fan electronics_fan_right",
+    "neopixel case",
+    "led_effect",
+    "led_effect case_heating",
+    "led_effect light",
+    "led_effect rainbow",
+    "led_effect white",
+    "led_effect Error",
+    "tmc5160 stepper_x",
+    "tmc5160 stepper_y",
+    "tmc5160 stepper_z",
+    "tmc5160 stepper_z1",
+    "tmc5160 stepper_z2",
+    "tmc5160 stepper_z3",
+    "temperature_sensor mcu_temp",
+    "temperature_host OrangePi",
+    "temperature_sensor OrangePi",
+    "verify_heater heater_bed",
+    "pid_calibrate",
+    "heater_bed",
+    "gcode_macro _PA_DATA_STORAGE",
+    "gcode_macro PA_PLANE_PLOT",
+    "gcode_macro PA_MULTI_PLANE_PLOT",
+    "gcode_macro PA_PLANE_SINGLE_PLOT",
+    "gcode_macro REACTOR_STATS",
+    "gcode_macro RELOAD",
+    "gcode_macro SHX",
+    "gcode_macro SHXB",
+    "gcode_macro _REGISTER_MODULES_AT_START",
+    "delayed_gcode _REGISTER_MODULES_AT_START",
+    "gcode_macro TEST_XY",
+    "gcode_macro REDPILL",
+    "gcode_macro INSPECT_OBJECT",
+    "gcode_macro _check_kinematic_limits",
+    "gcode_macro _PATH_SUBDIVISION",
+    "gcode_macro INTERACTIVE_CONSOLE_TEST",
+    "gcode_macro TEST_SCRIPT_INJECTION",
+    "gcode_macro IMG",
+    "gcode_macro BUT",
+    "gcode_macro SHOW_COLOR_SWATCHES",
+    "gcode_macro SHOW_HUE_GRID",
+    "gcode_macro TC_DEBUG_VIZ",
+    "gcode_macro update_git",
+    "gcode_shell_command update_git_script",
+    "gcode_macro PA_TEST",
+    "gcode_macro DROPOFF_TEST",
+    "input_shaper",
+    "gcode_macro SHAPER_ALL",
+    "gcode_macro SHAPER_X",
+    "gcode_macro SHAPER_Y",
+    "gcode_shell_command adxl_x",
+    "gcode_shell_command adxl_y",
+    "gcode_macro excitate_axis_at_freq",
+    "gcode_macro axes_map_calibration",
+    "gcode_macro compare_belts_responses",
+    "gcode_macro axes_shaper_calibration",
+    "gcode_macro create_vibrations_profile",
+    "shaketune",
+    "gcode_macro LOAD_FILAMENT",
+    "gcode_macro Test5",
+    "gcode_macro _PURGE",
+    "gcode_macro MOVE_OVER_BUCKET",
+    "gcode_macro PURGE_TOOL",
+    "gcode_macro _PURGE_TOOL",
+    "heater_power_distributor toolheads",
+    "gcode_macro ALL_TOOLHEADS_TEMP",
+    "gcode_macro TEST_AXIS",
+    "sensorless_auto_tune",
+    "gcode_macro TC_DOCK_AUTOTUNE",
+    "delayed_gcode _TCDOCK_LOOP",
+    "gcode_macro _TCDOCK_LOOP",
+    "gcode_macro _TC_DOCK_AUTOTUNE_REDO_BASELINE_BUTTON",
+    "tool_drop_detection",
+    "gcode_macro TDD_SET_SHUTTLE_DEFAULTS",
+    "gcode_macro PLOT_PATH",
+    "gcode_macro TEST_ENDSTOP_REPEATABILITY",
+    "gcode_macro _TEST_ENDSTOP_REPEATABILITY",
+    "gcode_macro DOC_DUMP",
+    "gcode_macro _DEBUG_OUTPUT_OLD",
+    "gcode_macro DEBUG_OUTPUT",
+    "gcode_macro TEST_TC_UPDATE_OFFSETS_FROM_SVF",
+    "gcode_macro SEARCH",
+    "gcode_macro PRINT_PRINTER_PATH",
+    "delayed_gcode _REGISTER_IMPORTS_AT_START",
+    "gcode_macro DEBUG_GLOBALS",
+    "gcode_macro _bedmesh_helper_macros",
+    "gcode_macro TEST_BEDHELPER_DIRECT",
+    "gcode_macro _global_macros",
+    "gcode_macro _homing_helper_macros",
+    "gcode_macro _html_helper_macros",
+    "gcode_macro TEST_MY_HTML",
+    "gcode_macro _math_helper_macros",
+    "gcode_macro _save_config_helper_macros",
+    "gcode_macro _toolchanger_helper_macros",
+    "gcode_macro _variable_helper_macros",
+    "gcode_macro DOCK_TUNER",
+    "gcode_macro RESPOND",
+    "gcode_macro _RAISE",
+    "gcode_macro _TOOLCHANGE_ERROR_HANDLER",
+    "delayed_gcode _verify_pickup_error_handler",
+    "gcode_macro RAISE_Z_A_BIT",
+    "delayed_gcode _INIT_AT_STARTUP",
+    "delayed_gcode _MIGRATION_CONFIG_CHECK_AND_STARTUP_VALUE_LOADING",
+    "gcode_macro _MIGRATION_CONFIG_CHECK_AND_STARTUP_VALUE_LOADING",
+    "gcode_macro M104",
+    "gcode_macro M109",
+    "gcode_macro SAVE_TOOLTEMP_STATE",
+    "gcode_macro RESTORE_TOOLTEMP_STATE",
+    "gcode_macro _TAP_PROBE_ACTIVATE",
+    "gcode_macro SHOW_LAST_CALIBRATION_RESULTS",
+    "gcode_macro _TC_LOG_OFFSET_HISTORY",
+    "gcode_macro TC_OFFSET_STATS",
+    "gcode_macro _TC_ADJUST_TTBZ_DRIFT",
+    "gcode_macro MOVE_OVER_PROBE",
+    "gcode_macro TC_FIND_TOOL_OFFSETS",
+    "gcode_macro _TC_UPDATE_OFFSETS",
+    "gcode_macro TC_PROBE_CALIBRATION_PROBE",
+    "gcode_macro TC_FIND_PROBE_TRIGGER_TO_BOTTOM",
+    "gcode_macro _TC_FIND_PROBE_TRIGGER_TO_BOTTOM",
+    "gcode_macro TC_FIND_FIRST_CALIBRATION_PROBE_POSITION",
+    "gcode_macro _TC_FIND_FIRST_CALIBRATION_PROBE_POSITION",
+    "gcode_macro DEBUG_LED",
+    "delayed_gcode _LOAD_CLEAN_NOZZLE_LOCATION",
+    "gcode_macro _T0_vars",
+    "gcode_macro _T1_vars",
+    "gcode_macro _T2_vars",
+    "gcode_macro _T3_vars",
+    "gcode_macro _T4_vars",
+    "gcode_macro _toolchanger_led_vars",
+    "delayed_gcode _SCALE_IDLE_BRIGHTNESS",
+    "delayed_gcode _INITIALIZE_TOOL_LED_TEMPLATES",
+    "gcode_macro STATUS_OFF",
+    "gcode_macro STATUS_MESHING",
+    "gcode_macro STATUS_ON",
+    "gcode_macro _OVERWRITE_STATUS",
+    "gcode_macro STATUS_HEATING",
+    "gcode_macro STATUS_READY",
+    "gcode_macro STATUS_RESET",
+    "gcode_macro STATUS_IDLE",
+    "gcode_macro LOAD_TOOL_LED_TEMPLATE",
+    "gcode_macro _UPDATE_TOOL_UI",
+    "gcode_macro SHAPER_CALIBRATE",
+    "gcode_macro TC_LOAD_SHAPERS",
+    "gcode_macro TC_SHAPER_CALIBRATE",
+    "gcode_macro _TC_SHAPER_CALIBRATE_SAVE_TO_SVF",
+    "gcode_macro _TC_SHAPER_CALIBRATE_SAVE_PARAMS",
+    "delayed_gcode _FILAMENT_RUNOUT_STARTUP_UNLOCK",
+    "gcode_macro FILAMENT_RUNOUT",
+    "delayed_gcode _RUNOUT_WATCHDOG_LOOP",
+    "gcode_macro _RUNOUT_WATCHDOG",
+    "gcode_macro _FILAMENT_RUNOUT_MANAGER",
+    "gcode_macro _FILAMENT_INSERT_MANAGER",
+    "delayed_gcode _HEAT_SOAK_UPDATE",
+    "gcode_macro PRINT_START",
+    "gcode_macro PART_AREA",
+    "delayed_gcode _LAZY_PAUSE_CHECK",
+    "gcode_macro LAZY_PAUSE",
+    "delayed_gcode _ENSURE_TOOLHEAD_BEFORE_TIMEOUT",
+    "gcode_macro PRIME_LINES",
+    "gcode_macro HEATSOAK",
+    "gcode_macro _PRINT_START",
+    "gcode_macro PRINT_END",
+    "gcode_macro _MOVE_BACK_END_PAUSE_CANCEL",
+    "gcode_macro HEAT_TOOLS",
+    "gcode_macro SET_PAUSE_AT_EXTRUSION_ROLE",
+    "gcode_macro CLEAN_NOZZLE",
+    "force_move",
+    "gcode_macro _MOVE_AWAY_FROM_AXIS_EXTREME",
+    "homing",
+    "homing_override",
+    "gcode_macro G32",
+    "gcode_macro QUAD_GANTRY_LEVEL",
+    "gcode_macro PAIN_GANTRY_LEVEL",
+    "gcode_macro BED_MESH_CALIBRATE",
+    "gcode_macro _SET_GCODE_OFFSET_UI",
+    "gcode_macro SET_GCODE_OFFSET",
+    "gcode_macro TC_LOAD_OFFSETS",
+    "gcode_macro _TC_ADJUST_HOME_OFFSET",
+    "gcode_macro TOOLCHANGE_DEMO",
+    "gcode_macro MOVE_TO_CENTER",
+    "gcode_macro CLEAR_PAUSE",
+    "gcode_macro PRINT_STATUS",
+    "gcode_macro UNSAFE_LOWER_BED",
+    "gcode_macro UNSAFE_RAISE_BED",
+    "gcode_macro UNLOAD_FILAMENT",
+    "gcode_macro UNLOAD_ONE_FILAMENT",
+    "gcode_macro UNLOAD_ALL_FILAMENT",
+    "gcode_macro CHANGE_NOZZLE",
+    "gcode_macro UI_CENTRAL",
+    "gcode_macro ADJUST_TOOL_OFFSETS_UI",
+    "gcode_macro TC_CALIRATE_UI",
+    "gcode_macro TOOL_REMAP_UI",
+    "gcode_macro SELECT_TOOL",
+    "gcode_macro _auto_continue",
+    "delayed_gcode _auto_continue_loop",
+    "gcode_macro _auto_continue_retry",
+    "gcode_macro SAVE_DOCK_HERE",
+    "gcode_macro _TX_INFO",
+    "gcode_macro _UNIFIED_RESPOND",
+    "pa_test",
+    "delayed_gcode start_pa_test",
+    "delayed_gcode end_pa_test",
+    "gcode_macro RUN_PA_TEST",
+    "exclude_object",
+    "gcode_arcs",
+    "idle_timeout",
+    "save_variables",
+    "resonance_tester",
+    "quad_gantry_level",
+    "bed_mesh",
+    "rounded_path",
+    "gcode_macro _toolchanger_settings",
+    "tools_calibrate",
+    "gcode_macro TOOL_PROBE_CRASH_RESUME",
+    "gcode_macro T99",
+    "gcode_macro T98",
+    "gcode_macro SVF_BACKUP",
+    "delayed_gcode _SVF_BACKUP",
+    "board_pins",
+    "telemetry",
+    "motion_report",
+    "query_endstops",
+    "system_stats",
+    "statistics",
+    "manual_probe",
+    "tuning_tower",
+    "garbage_collection",
+    "toolhead",
+    "verify_heater extruder",
+    "extruder",
+    "verify_heater extruder1",
+    "extruder1",
+    "verify_heater extruder2",
+    "extruder2",
+    "verify_heater extruder3",
+    "extruder3",
+    "verify_heater extruder4",
+    "extruder4"
+  ]
+}

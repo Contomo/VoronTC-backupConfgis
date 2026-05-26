@@ -1,0 +1,212 @@
+
+[gcode_macro LOAD_ADAPTIVE_MODEL]
+description: Loads the best-matching nonlinear pressure advance model for a given material and tool.
+    Usage: LOAD_ADAPTIVE_MODEL [EXTRUDER=extruder] [MATERIAL=abs]
+variable_json_path: '~/printer_data/config/calico_shizzle/pressure_advance/nonlinear_pa_models.json'
+gcode:
+    {% set SELF = 'LOAD_ADAPTIVE_MODEL' %}
+
+    {% set illib = printer.printer.__class__.__init__.__globals__.importlib -%}
+    {% set os   = illib.import_module('os') %}
+    {% set io   = illib.import_module('io') %}
+    {% set re   = illib.import_module('re') %}
+    {% set json = illib.import_module('json') %}
+    {% set ast  = illib.import_module('ast') %}
+
+    {% macro main() %}
+        {% if 'GENERATE_ORCA' in params %}
+            { _generate_orca_lines() }
+        {% elif 'HEATER' not in params or 'MATERIAL' not in params %}
+            { err("Usage: " ~ SELF ~ " HEATER=<heater> MATERIAL=<type> (or GENERATE_ORCA=1)") }
+        {% else %}
+            {% set heater = params.HEATER %}
+            {% set material = params.MATERIAL|d('')|string|lower %}
+            { _load_model(heater, material) }
+        {% endif %}
+    {% endmacro %}
+
+    {%- macro _load_model(heater, material) -%}
+
+        {% set _content = read_file_content(json_path) %}
+        {% set pa_models = json.loads(_content) if _content %}
+
+        {% set tool = printer|selectattr('extruder', '==', heater)
+                             |selectattr('param_hotend', 'defined')
+                             |list|first %}
+
+        {% set target_hotend = printer[tool].params_hotend %}
+        {% set e_name = printer.tool.extruder %}
+        
+        {% if e_name %}
+            {% set extruder = printer[e_name] %}
+            {% set e_cfg    = printer.configfile.settings[e_name] %}
+            {% set nozzle = e_cfg.nozzle_diameter %}
+
+            # printer.extruder (dict)
+            # can_extrude: False (bool)
+            # control_stats: (dict)
+            # linear_advance: 0.05 (float)
+            # linearization_velocity: 1.0 (float)
+            # nonlinear_offset: 0.0 (float)
+            # pid_profile: default (str)
+            # power: 0.0 (float)
+            # pressure_advance_model: tanh (str)
+            # smooth_time: 0.02 (float)
+            # target: 0.0 (float)
+            # temperature: 23.01 (float)
+            # time_offset: 0.0015 (float)
+
+            # configfile.settings.extruder (dict)
+            # ambient_transfer: 0.100204 (float)
+            # block_heat_capacity: 14.3193 (float)
+            # control: mpc (str)
+            # cooling_fan: fan_generic T0_partfan (str)
+            # dir_pin: et0: PD1 (str)
+            # enable_pin: !et0: PD2 (str)
+            # fan_ambient_transfer: [] (list)
+            # filament_density: 1.07 (float)
+            # filament_diameter: 1.75 (float)
+            # filament_heat_capacity: 1.7 (float)
+            # filament_temperature_source: ambient (str)
+            # full_steps_per_rotation: 200 (int)
+            # gear_ratio: [] (list)
+            # heater_pin: et0: PB13 (str)
+            # heater_power: 63.0 (float)
+            # high_precision_step_compress: False (bool)
+            # inline_resistor: 0.0 (float)
+            # instantaneous_corner_velocity: 1.0 (float)
+            # linear_advance: 0.05 (float)
+            # linearization_velocity: 1.0 (float)
+            # max_extrude_cross_section: 0.64 (float)
+            # max_extrude_only_accel: 3991.2162055371646 (float)
+            # max_extrude_only_distance: 1400.0 (float)
+            # max_extrude_only_velocity: 532.1621607382885 (float)
+            # max_power: 1.0 (float)
+            # max_temp: 300.0 (float)
+            # maximum_retract: 2.0 (float)
+            # microsteps: 32 (int)
+            # min_ambient_change: 1.0 (float)
+            # min_extrude_temp: 170.0 (float)
+            # min_temp: 0.0 (float)
+            # nonlinear_offset: 0.0 (float)
+            # nozzle_diameter: 0.4 (float)
+            # pid_kd: 47.413 (float)
+            # pid_ki: 12.469 (float)
+            # pid_kp: 48.629 (float)
+            # pid_version: 1 (int)
+            # pressure_advance_model: tanh (str)
+            # pressure_advance_smooth_time: 0.02 (float)
+            # pressure_advance_time_offset: 0.0015 (float)
+            # pullup_resistor: 4700.0 (float)
+            # pwm_cycle_time: 0.1 (float)
+            # rotation_distance: 5.6 (float)
+            # sensor_pin: et0: PA3 (str)
+            # sensor_responsiveness: 0.102515 (float)
+            # sensor_type: ATC Semitec 104NT-4-R025H42G (str)
+            # smooth_time: 0.2 (float)
+            # smoothing: 0.83 (float)
+            # steady_state_rate: 0.5 (float)
+            # step_pin: et0: PD0 (str)
+            # target_reach_time: 2.0 (float)
+
+        {% else %}
+            { err('tools extruder could not be found. (' ~ e_name ~ ')' )}
+        {% endif %}
+    {%- endmacro %}
+
+    # --------------------------------------------------------------------------------
+    {%- macro read_file_content(filepath='') -%}
+        {%- set full_path = os.path.expanduser(filepath) -%}
+        {%- if filepath and os.path.exists(full_path) and os.path.isfile(full_path) -%}
+            {%- set content = io.open(full_path, 'r', encoding='utf-8').read() -%}
+        {%- else %}
+            {- err("File not found or is not a regular file: '" ~ full_path ~ "'") -}
+        {%- endif -%}
+        { content or ''}
+    {%- endmacro -%}
+
+    # --------------------------------------------------------------------------------
+    {%- macro load_pa_info(heater, pa_info={}) -%}
+        {% set pa_args = [
+            ['EXTRUDER',    heater],
+            ['ADVANCE',     pa_info.linear_advance],
+            ['SMOOTH_TIME', pa_info.pressure_advance_smooth_time],
+            ['TIME_OFFSET', pa_info.pressure_advance_time_offset],
+            ['MODEL',       pa_info.pressure_advance_model],
+            ['OFFSET',      pa_info.nonlinear_offset],
+            ['VELOCITY',    pa_info.linearization_velocity]
+        ] %}
+        SET_PRESSURE_ADVANCE { pa_args|selectattr('1', 'defined')
+                                      |map('join', '=')
+                                      |join(' ') }
+    {%- endmacro -%}
+
+    # --------------------------------------------------------------------------------
+    {%- macro _generate_orca_lines() -%}
+        {%- set line_template = "{if is_extruder_used[$N]}LOAD_ADAPTIVE_MODEL HEATER=$E MATERIAL='{filament_type[$N]}'{endif}" %}
+        {%- set output = ["Add these lines to your slicer's 'Tool Change G-code' section:"] -%}
+        {%- for obj_name in printer if obj_name.startswith('extruder') -%}
+            {%- set number = '0' if obj_name == 'extruder' else obj_name|replace('extruder', '') -%}
+            {%- set heater = 'extruder  ' if obj_name == 'extruder' else obj_name -%}
+            {%- set _ = output.append(line_template|replace('$E', heater)|replace('$N', number)) -%}
+        {%- endfor -%}
+        { msg(output|join('\n')) }
+    {%- endmacro -%}
+
+    # --------------------------------------------------------------------------------
+    {%- macro score_matching_material(target, candidate) -%}
+        {%- set target_s, candidate_s = target|string|lower, candidate|string|lower -%}
+        {%- if target_s == candidate_s -%}
+            { 100 }
+        {%- else -%}
+            {%- set target_tokens    = re.findall('[a-z]+|\d+', target_s) -%}
+            {%- set candidate_tokens = re.findall('[a-z]+|\d+', candidate_s) -%}
+            {%- set unique_target    = target_tokens|unique|list -%}
+            {%- set unique_candidate = candidate_tokens|unique|list -%}
+            {%- set intersection     = unique_target|select('in', unique_candidate)|list -%}
+            {%- set union_size       = unique_target|length + unique_candidate|length - intersection|length -%}
+            
+            {%- if union_size == 0 -%}
+                { 0 }
+            {%- else -%}
+                # Base score: Jaccard index scaled to 0–80.
+                {%- set base_score = (intersection|length / union_size) * 80.0 -%} 
+
+                # Material families: used to give extra credit for "same family" matches.
+                {%- set material_families = [
+                    ['abs', 'asa'],
+                    ['petg', 'pctg', 'pet'],
+                    ['pla'],
+                    ['pc'],
+                    ['pa', 'pa6', 'pa12'],
+                    ['tpu', 'filaflex']
+                ] -%}
+                
+                {%- set all_cores      = material_families|sum(start=[]) -%}
+                {%- set target_core    = unique_target   |select('in', all_cores)|list|first -%}
+                {%- set candidate_core = unique_candidate|select('in', all_cores)|list|first -%}
+
+                {%- if target_core and candidate_core -%}
+                    {%- if target_core == candidate_core -%}
+                        {%- set core_bonus = 20 -%}
+                    {%- else -%}
+                        {%- set shared_families = material_families|select('in', target_core)
+                                                                   |select('in', candidate_core)
+                                                                   |list -%}
+                        {%- set core_bonus = 10 if shared_families -%}
+                    {%- endif -%}
+                {%- endif -%}
+                { (base_score + core_bonus or 0)|round|int }
+            {%- endif -%}
+        {%- endif -%}
+    {%- endmacro -%}
+
+    # --------------------------------------------------------------------------------
+    {%- macro msg(s, prefix_color="--v-accent-base", msg_color="--p-text-color2", respond=action_respond_info) -%}
+        {%- set desc = printer.configfile.settings['gcode_macro ' ~ SELF|lower].description|d(SELF) -%}
+        {%- set pre  = "<span style=\"color: var(" ~ prefix_color ~ "); font-weight:bold;\" title=\"" ~ desc ~ "\">" ~ SELF ~ " </span>" -%}
+        {%- set _ = respond(pre ~ "<span style=\"color: var(" ~ msg_color ~ ");\" title=\"" ~ desc ~ "\">" ~ s ~ "</span>") %}
+    {%- endmacro -%}
+    {%- macro err(s) -%}{%- set _ = msg(s, prefix_color="--v-error-base", msg_color="--v-warning-base") -%}{%- endmacro -%}
+
+    { main() }

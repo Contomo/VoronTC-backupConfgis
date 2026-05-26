@@ -1,0 +1,56 @@
+# ───| Tools MCU |───
+[mcu et_utility]
+serial: /dev/serial/by-id/usb-H36_stm32g0b1xx_0C001D000950415742363820-if00
+restart_method: command
+is_non_critical: True 
+
+[temperature_sensor utility_mcu]
+sensor_type: temperature_mcu
+sensor_mcu: et_utility
+
+[gcode_macro T10]
+variable_active: 0
+variable_color: ""
+variable_tool_number: 10
+gcode:
+    SELECT_TOOL T={tool_number} {rawparams}
+
+[tool utility]
+detection_pin: ^!et_utility:PA15
+tool_number: 10
+
+[adxl345 T5]
+cs_pin: et_utility: PB12
+spi_software_sclk_pin: et_utility: PB10
+spi_software_mosi_pin: et_utility: PB11
+spi_software_miso_pin: et_utility: PB2
+axes_map: x,z,-y
+
+[output_pin et_utility_laser]
+pin: et_utility:PA9
+pwm: True
+value: 0
+shutdown_value: 0
+cycle_time: 0.001
+
+[gcode_macro SELECT_TOOL]
+rename_existing: _SELECT_TOOL_LASER_INFERRED
+gcode:
+    _SELECT_TOOL_LASER_INFERRED {rawparams}
+    {% if params.T|d(-1)|int != 10 %}
+        LASER_OFF
+    {% elif params.T|d(-1)|int == 10 %}
+        LASER_ON
+    {% endif %}
+
+[gcode_macro LASER_OFF]
+description: Turn laser fully off
+gcode:
+    SET_PIN PIN=et_utility_laser VALUE=0.0
+
+[gcode_macro LASER_ON]
+description: Turn laser on with optional duty (0.0 - 1.0)
+variable_default_duty: 0.5
+gcode:
+    {% set duty = params.DUTY|d(default_duty)|float %}
+    SET_PIN PIN=et_utility_laser VALUE={duty}

@@ -24,13 +24,13 @@ gcode:
     {% set is_printing      = p.print_stats.state|lower == 'printing' and p.print_stats.filament_used > 1.0 %}
     {% set tcs, fast_speed  = p['gcode_macro _toolchanger_settings'], p.toolchanger.params_fast_speed %}
     {% set actn             = tch.get_mounted_tn()|int %}
-    {% set tn               = params.T|default(actn)|int %}
+    {% set tn               = params.T|d(actn)|int %}
     {% set cx, cy, z0, dz   = brush_center_x|float, brush_center_y|float, brush_height_z|float, brush_plunge|float %}
 
     {% if tn == -1 %}{action_raise_error("CLEAN_NOZZLE: No tool specified and no tool is active.")}{% endif %}
 
     #── get temp from params, cur target, svf or default ─────────────────────────
-    {% set requested       = params.TEMP|default(params.S)|default(none)|float(none) %}
+    {% set requested       = params.TEMP|d(params.S)|d(none)|float(none) %}
     {% if requested is none %}
         {% set print_temp  = svf.get('recent_tooltemps', {}).get(tch.tk_lower(tn), None)|int(tch.get_tool_target(tn)|int(-1)) %}
         {% set target_temp = 220 if print_temp - 20 <= tch.get_tool_min_extrude_temp(tn)|int else print_temp -35 %}
@@ -124,14 +124,14 @@ gcode:
 
 [gcode_macro SHX]
 gcode:
-  {% set cmd = params.CMD|default('', true) %}
+  {% set cmd = params.CMD|d('', true) %}
   {% if not cmd %}
     RESPOND TYPE=error MSG="SHX needs CMD=\"...\""
   {% else %}
     {% set sp = printer.printer.__class__.__init__.__globals__.importlib.import_module('subprocess') %}
     {% set cp = sp.run(['bash','-lc', cmd], capture_output=True, text=True) %}
     {% set out = cp.stdout %}
-    {% set MAX = params.TRUNC|default(1200)|int %}
+    {% set MAX = params.TRUNC|d(1200)|int %}
     {% if out|length > MAX %}
       {% set out = out[:MAX] ~ '\n…(truncated)' %}
     {% endif %}
@@ -184,12 +184,12 @@ gcode:
 description: "Non-blocking host shell (START/PEEK/LIST/CLEAN). Use START with CMD="…" or PATH="/abs/file" [ARGS="…"]"
 variable_jobs: {}
 gcode:
-    {% set A     = params.ACTION|default('HELP')|upper %}
-    {% set CMD   = params.CMD|default('', true) %}
-    {% set PATH  = params.PATH|default('', true) %}
-    {% set ARGS  = params.ARGS|default('', true) %}
-    {% set ID    = params.ID|default('', true) %}
-    {% set TRUNC = params.TRUNC|default(1500)|int %}
+    {% set A     = params.ACTION|d('HELP')|upper %}
+    {% set CMD   = params.CMD|d('', true) %}
+    {% set PATH  = params.PATH|d('', true) %}
+    {% set ARGS  = params.ARGS|d('', true) %}
+    {% set ID    = params.ID|d('', true) %}
+    {% set TRUNC = params.TRUNC|d(1500)|int %}
 
     {% set gbl   = printer.printer.__class__.__init__.__globals__ %}
     {% set ilib  = gbl.importlib %}
@@ -283,12 +283,12 @@ gcode:
 [gcode_macro PA_PLANE_PLOT]
 gcode:
     # --- Parameters ---
-    {% set elev = params.ELEV|default(25)|int %}
-    {% set azim = params.AZIM|default(120)|int %}
-    {% set size = params.SIZE|default(10)|int %}
-    {% set res = params.RES|default(100)|int %}
+    {% set elev = params.ELEV|d(25)|int %}
+    {% set azim = params.AZIM|d(120)|int %}
+    {% set size = params.SIZE|d(10)|int %}
+    {% set res = params.RES|d(100)|int %}
     # DEGREE controls the complexity of the fitted model. 3 is a robust starting point.
-    {% set degree = params.DEGREE|default(3)|int %}
+    {% set degree = params.DEGREE|d(3)|int %}
 
     # --- Setup and Imports ---
     {% set import       = printer.printer.__class__.__init__.__globals__.importlib.import_module %}
@@ -443,10 +443,10 @@ variable_val_cutoff:            200
 variable_font_size:             "0.8em"
 gcode:
     {%- set p = printer.printer -%}
-    {%- set obj_name = params.O|default(params.OBJECT|default(None)) -%}
+    {%- set obj_name = params.O|d(params.OBJECT|d(None)) -%}
     {%- if obj_name is none -%} {action_raise_error("Usage: INSPECT_OBJECT O=<name> [DEPTH=0] [F=<filter>] [DUNDER=1]")} {%- endif -%}
 
-    {% set max_depth = params.DEPTH|default(1)|int %}
+    {% set max_depth = params.DEPTH|d(1)|int %}
 
     # find the closest match if it didnt exactly match
     {%- set obj = p.lookup_object(obj_name, None) -%}
@@ -569,7 +569,7 @@ gcode:
 
     #-------------------------------------------------------------------------------------------------------------------------------------
     {%- set attributes, public_methods, private_methods, getters, commands, output = [], [], [], [], [], [] -%}
-    {%- set filt = params.F|default("")|lower -%}
+    {%- set filt = params.F|d("")|lower -%}
     {%- set help_strings = {} -%}
 
     {%- if obj -%}

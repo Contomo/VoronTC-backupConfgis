@@ -1,0 +1,167 @@
+[gcode_macro _TC_SHAPER_Analysis]
+variable_jobs: {}
+variable_settings: {
+    'script': '~/klipper/scripts/calibrate_shaper.py',
+    'out_dir': '~/printer_data/config/shaper_images'
+}
+gcode:
+    {% set action = params.ACTION|d('CHECK') %}
+    
+    # --- Python Imports ---
+    {% set gbl = printer.printer.__class__.__init__.__globals__ %}
+    {% set sp = gbl.importlib.import_module('subprocess') %}
+    {% set os = gbl.importlib.import_module('os') %}
+    {% set glob = gbl.importlib.import_module('glob') %}
+    {% set sys = gbl.importlib.import_module('sys') %}
+    {% set time = gbl.importlib.import_module('time') %}
+    {% set re = gbl.importlib.import_module('re') %}
+    {% set builtins = gbl.importlib.import_module('builtins') %}
+
+    # --- ACTION: SPAWN (Start a Job) ---
+    {% if action == 'SPAWN' %}
+        {% set tool = params.TOOL %}
+        {% set axis = params.AXIS|upper %}
+        
+        # Find CSV
+        {% set pattern = '/tmp/resonances_' ~ axis|lower ~ '_' ~ tool ~ '*.csv' %}
+        {% set files = glob.glob(pattern) %}
+        {% if not files %}
+            {% set pattern = '/tmp/resonances_' ~ axis|lower ~ '*.csv' %}
+            {% set files = glob.glob(pattern) %}
+        {% endif %}
+
+        {% if files %}
+            {% set csv = max(files, key=os.path.getmtime) %}
+            {% set timestamp = time.strftime('%Y-%m-%d_%H-%M') %}
+            {% set plot_file = os.path.join(os.path.expanduser(settings.out_dir), 'plot_' ~ tool ~ '_' ~ axis|lower ~ '_' ~ timestamp ~ '.png') %}
+            {% set txt_file = '/tmp/shaper_' ~ tool ~ '_' ~ axis ~ '_' ~ timestamp ~ '.txt' %}
+            
+            # Construct Command: NICE -> Python -> Log -> Marker
+            {% set cmd = "nice -n 19 " ~ sys.executable ~ " " ~ os.path.expanduser(settings.script) ~ " " ~ csv ~ " -o " ~ plot_file ~ " > " ~ txt_file ~ " && echo '###DONE###' >> " ~ txt_file %}
+            
+            # Fire and Forget
+            {% set _ = sp.Popen(cmd, shell=True) %}
+            
+            # Add to State
+            {% set job_id = tool ~ "_" ~ axis %}
+            {% set _ = jobs.update({job_id: {'tool': tool, 'axis': axis, 'txt': txt_file, 'plot': plot_file}}) %}
+            SET_GCODE_VARIABLE MACRO=_TC_SHAPER_Analysis VARIABLE=jobs VALUE="{jobs}"
+            
+            # Start Ping
+            UPDATE_DELAYED_GCODE ID=_TC_SHAPER_Analysis_Tick DURATION=1
+            { action_respond_info("TC_SHAPER: Analysis started for " ~ tool ~ " " ~ axis) }
+        {% else %}
+            { action_respond_info("TC_SHAPER Error: No CSV found for " ~ tool ~ " " ~ axis) }
+        {% endif %}
+
+    # --- ACTION: CHECK (Poll Status) ---
+    {% elif action == 'CHECK' %}
+        {% set finished = [] %}
+        
+        {% for id, job in jobs.items() %}
+            {% if os.path.exists(job.txt) %}
+                {% set content = builtins.open(job.txt, 'r').read() %}
+                
+                {% if '###DONE###' in content %}
+                    {% set _ = finished.append(id) %}
+                    
+                    # 1. Parse Output
+                    {% set regex = 'Recommended shaper_type_.* = (.*), shaper_freq_.* = (.*) Hz' %}
+                    {% set match = re.search(regex, content) %}
+                    
+                    {% if match %}
+                        {% set rec_type = match.group(1)|upper %}
+                        {% set rec_freq = match.group(2) %}
+                        
+                        { action_respond_info("TC_SHAPER RESULT " ~ job.tool ~ " " ~ job.axis ~ ": " ~ rec_type ~ " @ " ~ rec_freq ~ "Hz") }
+                        
+                        # 2. Stage to Klipper (Pending)
+                        SET_INPUT_SHAPER SHAPER_TYPE_{job.axis}={rec_type} SHAPER_FREQ_{job.axis}={rec_freq}
+                        
+                        # 3. Commit to Tool Params (Calls your existing save logic)
+                        _TC_SHAPER_CALIBRATE_SAVE_PARAMS NAME="{job.tool}"
+                        
+                    {% else %}
+                        { action_respond_info("TC_SHAPER: Could not parse output for " ~ id) }
+                    {% endif %}
+                    
+                    # 4. Show Plot Link
+                    {% set rel_path = job.plot.split('/printer_data/', 1)[1] %}
+                    { action_respond_info("Plot " ~ job.axis ~ ": /server/files/" ~ rel_path) }
+                    
+                    # 5. Cleanup
+                    {% set _ = os.remove(job.txt) %}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+        
+        # Remove finished jobs
+        {% for id in finished %}
+            {% set _ = jobs.pop(id) %}
+        {% endfor %}
+        SET_GCODE_VARIABLE MACRO=_TC_SHAPER_Analysis VARIABLE=jobs VALUE="{jobs}"
+        
+        # Keep pinging if jobs exist
+        {% if jobs|length > 0 %}
+            UPDATE_DELAYED_GCODE ID=_TC_SHAPER_Analysis_Tick DURATION=2
+        {% else %}
+             { action_respond_info("TC_SHAPER: All analysis jobs finished.") }
+        {% endif %}
+    {% endif %}
+
+[delayed_gcode _TC_SHAPER_Analysis_Tick]
+initial_duration: 0
+gcode:
+    _TC_SHAPER_Analysis ACTION=CHECK
+
+
+[gcode_macro TC_SHAPER_CALIBRATE]
+description: Run sweeps and kick off async analysis.
+gcode:
+    {% set tc = printer.toolchanger %}
+    {% set cur = tc.tool_number %}
+    {% set req = params.T|d(cur)|string %}
+    
+    # --- Tool Queue Logic ---
+    {% set queue = [] %}
+    {% set tns = tc.tool_numbers %}
+    {% for raw in (tns if req == 'all' else req.split(',')|map('trim')) %}
+        {% set tn = raw|int(-1) %}
+        {% if tn in tns and tn not in queue %}
+             {% set _ = queue.insert(0, tn) if tn == cur else queue.append(tn) %}
+        {% endif %}
+    {% endfor %}
+
+    {% if queue|length == 0 %}
+        { action_respond_info("TC_SHAPER: No valid tools selected.") }
+    {% elif printer.toolhead.homed_axes != 'xyz' %}
+        { action_respond_info("TC_SHAPER: Homing first...") }
+        G28
+    {% endif %}
+
+    # --- Execution Loop ---
+    {% if queue|length > 0 and printer.toolhead.homed_axes == 'xyz' %}
+        {% for tn in queue %}
+            {% set name = tc.tool_names[tn] %}
+            {% set accel = (printer[name].get('params_accelerometer', 'adxl345 ' ~ name|replace('tool ', '')))|string %}
+            
+            {% if accel|lower in printer.configfile.settings %}
+                { action_respond_info(">> Processing " ~ name ~ " <<") }
+                
+                # 1. Select Tool
+                {% if cur != tn %} T{tn} {% endif %}
+
+                # 2. X Axis: Sweep -> Launch Analysis
+                TEST_RESONANCES AXIS=X CHIPS="{accel}" NAME="{name|replace('tool ', '')}"
+                _TC_SHAPER_Analysis ACTION=SPAWN TOOL="{name|replace('tool ', '')}" AXIS=X
+
+                # 3. Y Axis: Sweep -> Launch Analysis
+                TEST_RESONANCES AXIS=Y CHIPS="{accel}" NAME="{name|replace('tool ', '')}"
+                _TC_SHAPER_Analysis ACTION=SPAWN TOOL="{name|replace('tool ', '')}" AXIS=Y
+
+            {% else %}
+                { action_respond_info("TC_SHAPER: Accelerometer " ~ accel ~ " not found for " ~ name) }
+            {% endif %}
+        {% endfor %}
+        { action_respond_info("TC_SHAPER: Sweeps done. Analysis running in background...") }
+    {% endif %}
